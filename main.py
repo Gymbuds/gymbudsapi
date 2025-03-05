@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends,Query
+from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from app.db.session import SessionLocal, check_db_connection  # Import the check_db_connection function
-from app.db.database import Base, engine
-from app.db.models.item import Item
-from typing import Annotated
+from app.db.session import check_db_connection  # Import the check_db_connection function
+from app.db.models.user import User
+from app.db.session import get_db
+from pydantic import BaseModel
 # from app.db import models
 
 # Initialize FastAPI
@@ -16,29 +16,16 @@ async def startup():
         print("Database connection successful!")
     else:
         print("Failed to connect to the database!")
-@app.get("/items/{item_id}")
-async def read_item(item_id):
-    return{"item_id":item_id}
-@app.get("/items/")
-async def read_items(q: Annotated[str | None,Query(min_length=3,max_length=50)]= None,):
-    results = {"items": [{"item_id":"foo"},{"item_id":"foo"}]}
-    if q:
-        results.update({"q":q})
-    return results
-@app.get("/users")
-async def read_users():
-    return ["Rick", "Morty"]
 
+class UserCreate(BaseModel):
+    name: str
 
-@app.post("/items/")
-async def create_item(item:Item):
-    if item.price <= 2:
-        print(item.name,item.price)
-    return item
+@app.post("/users/")
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = User(name=user.name)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
 # Dependency to get the database session
-def get_db():
-    db = SessionLocal()  # Create a new session
-    try:
-        yield db
-    finally:
-        db.close()  # Close the session when done
