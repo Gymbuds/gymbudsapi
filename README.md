@@ -6,6 +6,8 @@ Backend API for GymBuds
 
 set up your poetry using poetry install
 if you need to install new packages do poetry add [package name]
+if you make changes to models
+poetry run alembic revision --autogenerate -m
 
 # set up your postgres DB
 
