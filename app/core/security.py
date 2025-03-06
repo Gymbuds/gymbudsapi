@@ -41,3 +41,18 @@ def decode_access_token(token: str):
     except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
     
+
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    # Decode the token and handle potential errors
+    payload = decode_access_token(token)
+    
+    # Use the 'sub' claim (typically the username or email) to find the user
+    user = db.query(User).filter(User.email == payload["sub"]).first()
+    if user is None:
+        raise credentials_exception
+    return user
