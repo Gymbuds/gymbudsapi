@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from app.db.session import check_db_connection  # Import the check_db_connection function
 from app.db.models.user import User
+from app.core.security import hash_password
 from app.db.session import get_db
 from pydantic import BaseModel
 # from app.db import models
@@ -19,10 +20,13 @@ async def startup():
 
 class UserCreate(BaseModel):
     name: str
+    email: str
+    password: str
 
 @app.post("/users/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = User(name=user.name)
+    hashed_password = hash_password(user.password)
+    db_user = User(name=user.name, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
