@@ -1,8 +1,8 @@
-"""login auth
+"""name, email, hashed password and refresh token
 
-Revision ID: 21042e4e27f8
-Revises: 34faa79649b7
-Create Date: 2025-03-06 15:34:15.842312
+Revision ID: a623dfc32c13
+Revises: cce4cad1c8a8
+Create Date: 2025-03-07 14:02:06.503579
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '21042e4e27f8'
-down_revision: Union[str, None] = '34faa79649b7'
+revision: str = 'a623dfc32c13'
+down_revision: Union[str, None] = 'cce4cad1c8a8'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
