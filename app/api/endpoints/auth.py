@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 # Login user and generate JWT token
-@router.post("/login")
+@router.post("/token")
 def login_user(email: str, password: str, db: Session = Depends(get_db)):
     # Find user by email
     user = db.query(User).filter(User.email == email).first()

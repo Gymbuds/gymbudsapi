@@ -27,3 +27,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     
     return {"message": "User created successfully"}
 
+# Get user profile
+@router.get("/profile")
+def get_user_profile(current_user: User = Depends(get_current_user)):
+    return {"name": current_user.name, "email": current_user.email}

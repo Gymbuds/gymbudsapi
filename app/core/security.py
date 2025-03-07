@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jwt import ExpiredSignatureError, InvalidTokenError, encode, decode
 from fastapi import HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.db.models.user import User
 from app.core.config import settings
 from app.db.session import get_db
@@ -10,17 +10,18 @@ from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# Initialize HTTPBearer security
+security = HTTPBearer()
 
-#Hashes a password using bcrypt
+# Hashes a password using bcrypt
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
-#Verifies if a plain password matches a hashed password
+# Verifies if a plain password matches a hashed password
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-#Generates a JWT access token
+# Generates a JWT access token
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
@@ -31,7 +32,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-#Decode JWT token
+# Decode JWT token
 def decode_access_token(token: str):
     try:
         payload = decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
@@ -42,16 +43,17 @@ def decode_access_token(token: str):
         raise HTTPException(status_code=401, detail="Invalid token")
     
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(db: Session = Depends(get_db), credentials: HTTPAuthorizationCredentials = Depends(security)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    # Decode the token and handle potential errors
+    
+    token = credentials.credentials  # Get the token from HTTPAuthorizationCredentials
     payload = decode_access_token(token)
     
-    # Use the 'sub' claim (typically the username or email) to find the user
+    # Use the 'sub' claim (email) to find the user
     user = db.query(User).filter(User.email == payload["sub"]).first()
     if user is None:
         raise credentials_exception
