@@ -1,5 +1,6 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String
+from sqlalchemy import Column,Integer,String,Float,Text,DateTime
+import datetime
 class User(Base):
     __tablename__ = "users"
 
@@ -8,3 +9,8 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     hashed_refresh_token = Column(String, nullable=True)
+    profile_picture = Column (String,nullable=True)
+    latitude = Column(Float,nullable=True)
+    longitude = Column (Float,nullable=True)
+    preferred_workout_goals = Column(Text,nullable = True)
+    created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
