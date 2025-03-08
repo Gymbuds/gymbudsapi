@@ -6,11 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 # Initialize FastAPI 
-app = FastAPI()
+app = FastAPI(host="0.0.0.0", port=8000)
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
