@@ -22,7 +22,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
-    f'{os.getenv('FRONT_END_URL')}',
+    f"{os.getenv('FRONT_END_URL')}",
 ]
 app.add_middleware(
     CORSMiddleware,
