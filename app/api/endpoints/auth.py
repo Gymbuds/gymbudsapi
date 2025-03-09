@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.core.security import verify_password, create_access_token, create_refresh_token, decode_access_token, get_current_user, hash_password
+from app.core.security import verify_password, create_access_token, create_refresh_token, decode_access_token, get_current_user, hash_password, create_password_reset_token, validate_password
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.db.models.user import User
 from app.db.session import get_db
@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 # Login user and generate JWT access token
-@router.post("/token")
+@router.post("/login")
 def login_user(email: str, password: str, db: Session = Depends(get_db)):
     # Find user by email
     user = db.query(User).filter(User.email == email).first()
@@ -35,7 +35,7 @@ def login_user(email: str, password: str, db: Session = Depends(get_db)):
     
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
-#Refresh JWT token to generate new access JWT tokens
+# Refresh JWT token to generate new access JWT tokens
 @router.post("/refresh")
 def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
     try:
@@ -68,3 +68,55 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
     user.hashed_refresh_token = None  # Invalidate refresh token
     db.commit()
     return {"message": "Logged out successfully"}
+
+# Reset password
+@router.post("/reset-password")
+async def request_password_reset(email: str, db: Session = Depends(get_db)):
+    # Get the user from the database
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Create a reset token for the user 
+    reset_token = create_password_reset_token(data={"sub": email})
+    
+    return {"reset_token": reset_token}
+
+# Reset password after verifying token
+@router.post("/reset-password/{reset_token}")
+def reset_password(reset_token: str, new_password: str, db: Session = Depends(get_db)):
+    try:
+        # Decode the token
+        payload = decode_access_token(reset_token)
+
+        # Get the user from the payload
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        # Retrieve the user from the database
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+        # Validate the password
+        validation_result = validate_password(new_password)
+        if validation_result != "Password is valid.":
+            raise HTTPException(
+               status_code=status.HTTP_400_BAD_REQUEST,
+                detail=validation_result
+            )
+    
+        # Update the user's password in the database
+        user.hashed_password = hash_password(new_password)
+        db.commit()
+
+        return {"message": "Password successfully reset."}
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Reset token has expired")
+    except InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid reset token")
