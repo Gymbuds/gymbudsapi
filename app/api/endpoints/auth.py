@@ -3,6 +3,7 @@ from app.core.security import verify_password, create_access_token, create_refre
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.db.models.user import User
 from app.db.session import get_db
+from app.services.email_service import send_reset_email
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -69,8 +70,8 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
     db.commit()
     return {"message": "Logged out successfully"}
 
-# Reset password
-@router.post("/reset-password")
+# Request password reset
+@router.post("/request-password-reset")
 async def request_password_reset(email: str, db: Session = Depends(get_db)):
     # Get the user from the database
     user = db.query(User).filter(User.email == email).first()
@@ -84,10 +85,13 @@ async def request_password_reset(email: str, db: Session = Depends(get_db)):
     # Create a reset token for the user 
     reset_token = create_password_reset_token(data={"sub": email})
     
-    return {"reset_token": reset_token}
+    # Send reset token via email 
+    await send_reset_email(email=email, reset_token=reset_token)
+    
+    return {"message": "Password reset email sent", "reset_token": reset_token}
 
 # Reset password after verifying token
-@router.post("/reset-password/{reset_token}")
+@router.post("/reset-password")
 def reset_password(reset_token: str, new_password: str, db: Session = Depends(get_db)):
     try:
         # Decode the token
