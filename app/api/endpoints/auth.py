@@ -12,8 +12,11 @@ router = APIRouter()
 # Login user and generate JWT access token
 @router.post("/login")
 def login_user(request: Login, db: Session = Depends(get_db)):
+    # Convert the input email to lowercase
+    email_lowercase = request.email.lower()
+
     # Find user by email
-    user = db.query(User).filter(User.email == request.email).first()
+    user = db.query(User).filter(User.email == email_lowercase).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -28,8 +31,8 @@ def login_user(request: Login, db: Session = Depends(get_db)):
         )
     
     # Create access and refresh tokens
-    access_token = create_access_token(data={"sub": user.email})
-    refresh_token = create_refresh_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": email_lowercase})
+    refresh_token = create_refresh_token(data={"sub": email_lowercase})
 
     # Store hashed refresh token in DB
     user.hashed_refresh_token = hash_password(refresh_token)
@@ -74,8 +77,11 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
 # Request password reset
 @router.post("/request-password-reset")
 async def request_password_reset(request: PasswordResetRequest, db: Session = Depends(get_db)):
+    # Convert the input email to lowercase
+    email_lowercase = request.email.lower()
+
     # Get the user from the database
-    user = db.query(User).filter(User.email == request.email).first()
+    user = db.query(User).filter(User.email == email_lowercase).first()
     
     if not user:
         raise HTTPException(
@@ -84,16 +90,16 @@ async def request_password_reset(request: PasswordResetRequest, db: Session = De
         )
     
     # Create a reset token for the user 
-    reset_token = create_password_reset_token(data={"sub": request.email})
+    reset_token = create_password_reset_token(data={"sub": email_lowercase})
     
     # Send reset token via email 
-    await send_reset_email(email=request.email, reset_token=reset_token)
+    await send_reset_email(email=email_lowercase, reset_token=reset_token)
     
     return {"message": "Password reset email sent", "reset_token": reset_token}
 
 # Reset password after verifying token
 @router.post("/reset-password")
-def reset_password(request:ResetPassword, db: Session = Depends(get_db)):
+def reset_password(request: ResetPassword, db: Session = Depends(get_db)):
     try:
         # Decode the token
         payload = decode_access_token(request.reset_token)
@@ -103,8 +109,11 @@ def reset_password(request:ResetPassword, db: Session = Depends(get_db)):
         if email is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
+        # Convert the email to lowercase for the lookup
+        email_lowercase = email.lower()
+
         # Retrieve the user from the database
-        user = db.query(User).filter(User.email == email).first()
+        user = db.query(User).filter(User.email == email_lowercase).first()
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
