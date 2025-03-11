@@ -4,11 +4,13 @@ from app.schemas.workout_log import WorkoutLogCreate
 
 def create_workout_log(db: Session, workout_log: WorkoutLogCreate) -> WorkoutLog:
     db_workout = WorkoutLog(
-        exercise=workout_log.exercise,
-        sets=workout_log.sets,
-        reps=workout_log.reps,
-        weight=workout_log.weight,
-        mood=workout_log.mood
+        user_id=workout_log.user_id,
+        title=workout_log.title,
+        type=workout_log.type.value,
+        exercise_details=[exercise.dict() for exercise in workout_log.exercise_details],
+        notes=workout_log.notes,
+        duration_minutes=workout_log.duration_minutes,
+        mood=workout_log.mood.value
     )
     db.add(db_workout)
     db.commit()
