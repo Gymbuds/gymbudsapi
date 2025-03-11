@@ -33,7 +33,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Create the user in the database
     new_user = create_user(db=db, email=user.email, password=hashed_password, name=user.name)
     
-    return {"message": "User created successfully"}
+    return {"success": "User created successfully"}
 
 # Get user profile
 @router.get("/profile")

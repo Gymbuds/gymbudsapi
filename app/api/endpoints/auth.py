@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import verify_password, create_access_token, create_refresh_token, decode_access_token, get_current_user, hash_password, create_password_reset_token, validate_password
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.db.models.user import User
+from app.schemas.user import Login, RefreshToken, PasswordResetRequest, ResetPassword
 from app.db.session import get_db
 from app.services.email_service import send_reset_email
 from sqlalchemy.orm import Session
@@ -10,9 +11,9 @@ router = APIRouter()
 
 # Login user and generate JWT access token
 @router.post("/login")
-def login_user(email: str, password: str, db: Session = Depends(get_db)):
+def login_user(request: Login, db: Session = Depends(get_db)):
     # Find user by email
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == request.email).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -20,7 +21,7 @@ def login_user(email: str, password: str, db: Session = Depends(get_db)):
         )
     
     # Verify password
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(request.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
@@ -38,9 +39,9 @@ def login_user(email: str, password: str, db: Session = Depends(get_db)):
 
 # Refresh JWT token to generate new access JWT tokens
 @router.post("/refresh")
-def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
+def refresh_access_token(request: RefreshToken, db: Session = Depends(get_db)):
     try:
-        payload = decode_access_token(refresh_token)  # Decode refresh token
+        payload = decode_access_token(request.refresh_token)  # Decode refresh token
         email = payload.get("sub")
 
         if email is None:
@@ -51,7 +52,7 @@ def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
         
         # Verify the provided refresh token against the stored hashed version
-        if not user.hashed_refresh_token or not verify_password(refresh_token, user.hashed_refresh_token):
+        if not user.hashed_refresh_token or not verify_password(request.refresh_token, user.hashed_refresh_token):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
 
         new_access_token = create_access_token(data={"sub": email})  # Generate new access token
@@ -72,9 +73,9 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
 
 # Request password reset
 @router.post("/request-password-reset")
-async def request_password_reset(email: str, db: Session = Depends(get_db)):
+async def request_password_reset(request: PasswordResetRequest, db: Session = Depends(get_db)):
     # Get the user from the database
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == request.email).first()
     
     if not user:
         raise HTTPException(
@@ -83,19 +84,19 @@ async def request_password_reset(email: str, db: Session = Depends(get_db)):
         )
     
     # Create a reset token for the user 
-    reset_token = create_password_reset_token(data={"sub": email})
+    reset_token = create_password_reset_token(data={"sub": request.email})
     
     # Send reset token via email 
-    await send_reset_email(email=email, reset_token=reset_token)
+    await send_reset_email(email=request.email, reset_token=reset_token)
     
     return {"message": "Password reset email sent", "reset_token": reset_token}
 
 # Reset password after verifying token
 @router.post("/reset-password")
-def reset_password(reset_token: str, new_password: str, db: Session = Depends(get_db)):
+def reset_password(request:ResetPassword, db: Session = Depends(get_db)):
     try:
         # Decode the token
-        payload = decode_access_token(reset_token)
+        payload = decode_access_token(request.reset_token)
 
         # Get the user from the payload
         email = payload.get("sub")
@@ -108,7 +109,7 @@ def reset_password(reset_token: str, new_password: str, db: Session = Depends(ge
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # Validate the password
-        validation_result = validate_password(new_password)
+        validation_result = validate_password(request.new_password)
         if validation_result != "Password is valid.":
             raise HTTPException(
                status_code=status.HTTP_400_BAD_REQUEST,
@@ -116,7 +117,7 @@ def reset_password(reset_token: str, new_password: str, db: Session = Depends(ge
             )
     
         # Update the user's password in the database
-        user.hashed_password = hash_password(new_password)
+        user.hashed_password = hash_password(request.new_password)
         db.commit()
 
         return {"message": "Password successfully reset."}
