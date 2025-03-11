@@ -11,8 +11,11 @@ router = APIRouter()
 # Register new user
 @router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if the user already exists
-    existing_user = db.query(User).filter(User.email == user.email).first()
+    # Convert the input email to lowercase
+    email_lowercase = user.email.lower()
+
+    # Check if the user already exists by the lowercase email
+    existing_user = db.query(User).filter(User.email == email_lowercase).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -30,10 +33,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Hash the password
     hashed_password = hash_password(user.password)
     
-    # Create the user in the database
-    new_user = create_user(db=db, email=user.email, password=hashed_password, name=user.name)
+    # Create the user in the database with the lowercase email
+    new_user = create_user(db=db, email=email_lowercase, password=hashed_password, name=user.name)
     
-    return {"message": "User created successfully"}
+    return {"success": "User created successfully"}
+
 
 # Get user profile
 @router.get("/profile")

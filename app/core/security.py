@@ -85,3 +85,14 @@ def validate_password(password: str) -> bool:
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):  # At least one special character
         return "Password must contain at least one special character."
     return "Password is valid."
+
+# Generates a JWT reset token with an expiration of 15 minutes
+def create_password_reset_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)  # Token expires in 15 minutes
+    to_encode.update({"exp": expire})
+    encoded_jwt = encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt
