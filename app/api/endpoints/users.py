@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import hash_password, get_current_user, validate_password
-from app.db.repositories.user_repo import create_user
+from app.db.crud.user_repo import create_user
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 
