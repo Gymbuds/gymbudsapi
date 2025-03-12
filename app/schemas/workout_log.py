@@ -32,6 +32,14 @@ class WorkoutLogBase(BaseModel):
 class WorkoutLogCreate(WorkoutLogBase):
     pass
 
+class WorkoutLogUpdate(BaseModel):
+    title: Optional[str] = None
+    type: Optional[LogMethod] = None
+    exercise_details: Optional[List[ExerciseDetail]] = None
+    notes: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    mood: Optional[MoodType] = None
+
 class WorkoutLog(WorkoutLogBase):
     id: int
     date: datetime
