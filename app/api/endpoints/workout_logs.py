@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.workout_log import WorkoutLog, WorkoutLogCreate, WorkoutLogUpdate
-from app.db.repositories.workout_log_repo import create_workout_log, get_workout_logs_by_user, update_workout_log
-from typing import List
+from app.db.repositories.workout_log_repo import create_workout_log, update_workout_log
 
 router = APIRouter()
 
@@ -21,11 +20,3 @@ def update_log(log_id: int, workout_log_update: WorkoutLogUpdate, db: Session = 
         raise HTTPException(status_code=404, detail="Workout log not found")
 
     return updated_log
-
-# Get all logs of a user
-@router.get("/logs/{user_id}", response_model=List[WorkoutLog])
-def get_logs(user_id: int, db: Session = Depends(get_db)):
-    logs = get_workout_logs_by_user(db, user_id)
-    if not logs:
-        raise HTTPException(status_code=404, detail="No logs found for this user.")
-    return logs

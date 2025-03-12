@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models.user import User
 from app.schemas.user import UserCreate
+from app.schemas.workout_log import WorkoutLog
 from app.core.security import hash_password, get_current_user, validate_password
+from app.db.repositories.workout_log_repo import get_workout_logs_by_user
 from app.db.repositories.user_repo import create_user
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from typing import List
 
 router = APIRouter()
 
@@ -43,3 +46,22 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.get("/profile")
 def get_user_profile(current_user: User = Depends(get_current_user)):
     return {"name": current_user.name, "email": current_user.email}
+
+# Get all logs of a user
+@router.get("/workout-logs", response_model=List[WorkoutLog])
+def get_logs(user_email: str, db: Session = Depends(get_db)):
+    email_lowercase = user_email.lower()
+    user = db.query(User).filter(User.email == email_lowercase).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User doesn't exist"
+        )
+    
+    logs = get_workout_logs_by_user(db=db, user_id=user.id)
+    
+    if not logs:
+        raise HTTPException(status_code=404, detail="No logs found for this user.")
+    
+    return logs

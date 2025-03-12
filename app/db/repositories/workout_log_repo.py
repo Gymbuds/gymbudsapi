@@ -64,7 +64,7 @@ def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogU
     db.refresh(db_workout)
     return db_workout
 
-# Fetch all workout logs for a given user
+# Fetch all workout logs for a given user by ID
 def get_workout_logs_by_user(db: Session, user_id: int):
     result = db.execute(select(WorkoutLog).where(WorkoutLog.user_id == user_id))
     return result.scalars().all()
