@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Depends,HTTPException,status
 from app.schemas.range import AvalRangeCreate
 from app.db.models.user import User
-from app.db.crud.range_crud import createavalRange
+from app.db.crud.range_crud import create_avail_range
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 
@@ -17,5 +17,5 @@ async def createAvalibilityRange(aval_range: AvalRangeCreate,db: Session = Depen
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User Does not exist"
         )
-    new_range = createavalRange(db=db, user_id=user_id, day_week=aval_range.day_of_week,start_time=aval_range.start_time,end_time=aval_range.end_time)
+    new_range = create_avail_range(db=db, user_id=user_id, day_week=aval_range.day_of_week,start_time=aval_range.start_time,end_time=aval_range.end_time)
     return new_range

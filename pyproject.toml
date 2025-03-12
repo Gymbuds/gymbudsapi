@@ -24,7 +24,7 @@ dependencies = [
     "databases (>=0.9.0,<0.10.0)",
     "alembic (>=1.15.1,<2.0.0)",
     "ngrok (>=1.4.0,<2.0.0)",
-    "fastapi-mail (>=1.4.2,<2.0.0)"
+    "fastapi-mail (>=1.4.2,<2.0.0)",
 ]
 
 
