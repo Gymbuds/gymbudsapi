@@ -1,7 +1,7 @@
-from app.db.database import Base
 from sqlalchemy import Column,Integer,Time,Enum,ForeignKey
 from sqlalchemy.orm import relationship
 import enum
+from app.db.database import Base
 class DayOfWeek(enum.Enum):
     Monday = "Monday"
     Tuesday = "Tuesday"

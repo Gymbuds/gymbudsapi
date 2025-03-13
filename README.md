@@ -28,5 +28,5 @@ if you are connected locally please visit
 http://127.0.0.1:8000/docs
 
 # mailhog (to see emails sent out for password reset)
--brew install mailhog
+-brew install mailhog (mac)
 -in terminal, run: mailhog
