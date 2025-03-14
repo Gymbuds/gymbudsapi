@@ -46,22 +46,3 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.get("/profile")
 def get_user_profile(current_user: User = Depends(get_current_user)):
     return {"name": current_user.name, "email": current_user.email}
-
-# Get all logs of a user
-@router.get("/workout-logs", response_model=List[WorkoutLog])
-def get_logs(user_email: str, db: Session = Depends(get_db)):
-    email_lowercase = user_email.lower()
-    user = db.query(User).filter(User.email == email_lowercase).first()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User doesn't exist"
-        )
-    
-    logs = get_workout_logs_by_user(db=db, user_id=user.id)
-    
-    if not logs:
-        raise HTTPException(status_code=404, detail="No logs found for this user.")
-    
-    return logs

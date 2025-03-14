@@ -21,7 +21,6 @@ class ExerciseDetail(BaseModel):
     weight: Optional[float] = None
 
 class WorkoutLogBase(BaseModel):
-    user_id: int
     title: str
     type: LogMethod
     exercise_details: List[ExerciseDetail]
@@ -43,3 +42,4 @@ class WorkoutLogUpdate(BaseModel):
 class WorkoutLog(WorkoutLogBase):
     id: int
     date: datetime
+    user_id: int

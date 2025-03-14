@@ -2,10 +2,11 @@ from app.db.models.workout_log import WorkoutLog
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 from app.schemas.workout_log import WorkoutLogCreate, WorkoutLogUpdate
+from typing import Optional
 
-def create_workout_log(db: Session, workout_log: WorkoutLogCreate) -> WorkoutLog:
+def create_workout_log(db: Session, workout_log: WorkoutLogCreate, user_id = int) -> WorkoutLog:
     db_workout = WorkoutLog(
-        user_id=workout_log.user_id,
+        user_id=user_id,
         title=workout_log.title,
         type=workout_log.type.value,
         exercise_details=[exercise.dict() for exercise in workout_log.exercise_details],
@@ -18,11 +19,11 @@ def create_workout_log(db: Session, workout_log: WorkoutLogCreate) -> WorkoutLog
     db.refresh(db_workout)
     return db_workout
 
-def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogUpdate) -> WorkoutLog:
-    db_workout = db.query(WorkoutLog).filter(WorkoutLog.id == log_id).first()
+def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogUpdate, user_id: int) -> Optional[WorkoutLog]:
+    db_workout = db.query(WorkoutLog).filter(WorkoutLog.id == log_id, WorkoutLog.user_id == user_id).first()
 
     if not db_workout:
-        return None  # Handle in the route
+        return None
 
     # Update fields if provided, otherwise retain existing values
     if workout_log_update.title is not None:
