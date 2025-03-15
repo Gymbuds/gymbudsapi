@@ -12,6 +12,19 @@ router = APIRouter()
 # Login user and generate JWT access token
 @router.post("/login")
 def login_user(request: Login, db: Session = Depends(get_db)):
+    """
+    Authenticate a user and generate an access token.
+
+    Args:
+        request (Login): The login request containing email and password.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the email is not found or the password is incorrect.
+
+    Returns:
+        dict: Contains the access token, refresh token, and token type.
+    """
     # Convert the input email to lowercase
     email_lowercase = request.email.lower()
 
@@ -43,6 +56,19 @@ def login_user(request: Login, db: Session = Depends(get_db)):
 # Refresh JWT token to generate new access JWT tokens
 @router.post("/refresh")
 def refresh_access_token(request: RefreshToken, db: Session = Depends(get_db)):
+    """
+    Refresh an expired access token using a valid refresh token.
+
+    Args:
+        request (RefreshToken): The refresh token request.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the token is invalid, expired, or does not match the stored token.
+
+    Returns:
+        dict: Contains a new access token and token type.
+    """
     try:
         payload = decode_access_token(request.refresh_token)  # Decode refresh token
         email = payload.get("sub")
@@ -70,6 +96,16 @@ def refresh_access_token(request: RefreshToken, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    """
+    Logout the authenticated user by invalidating the refresh token.
+
+    Args:
+        db (Session): The database session.
+        user (User): The currently authenticated user.
+
+    Returns:
+        dict: A success message confirming logout.
+    """
     user.hashed_refresh_token = None  # Invalidate refresh token
     db.commit()
     return {"message": "Logged out successfully"}
@@ -77,6 +113,19 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
 # Request password reset
 @router.post("/request-password-reset")
 async def request_password_reset(request: PasswordResetRequest, db: Session = Depends(get_db)):
+    """
+    Request a password reset by generating and sending a reset token via email.
+
+    Args:
+        request (PasswordResetRequest): The password reset request containing the user's email.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the user is not found.
+
+    Returns:
+        dict: A success message indicating that the reset email was sent.
+    """
     # Convert the input email to lowercase
     email_lowercase = request.email.lower()
 
@@ -100,6 +149,20 @@ async def request_password_reset(request: PasswordResetRequest, db: Session = De
 # Reset password after verifying token
 @router.post("/reset-password")
 def reset_password(request: ResetPassword, db: Session = Depends(get_db)):
+    """
+    Reset a user's password using a valid reset token.
+
+    Args:
+        request (ResetPassword): The password reset request containing the reset token and new password.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the token is invalid, expired, or the user is not found.
+        HTTPException: If the new password does not meet security criteria.
+
+    Returns:
+        dict: A success message confirming the password reset.
+    """
     try:
         # Decode the token
         payload = decode_access_token(request.reset_token)

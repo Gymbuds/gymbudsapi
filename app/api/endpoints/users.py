@@ -2,16 +2,28 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import hash_password, get_current_user, validate_password, create_access_token, create_refresh_token
-from app.db.repositories.user_repo import create_user
+from app.db.crud.user_crud import create_user
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from typing import List
 
 router = APIRouter()
 
 # Register new user
 @router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Register a new user and generate an access token.
+
+    Args:
+        user (UserCreate): The user data to create.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the email is already registered or the password is invalid.
+
+    Returns:
+        dict: A success message.
+    """    
     # Convert the input email to lowercase
     email_lowercase = user.email.lower()
 
@@ -50,4 +62,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 # Get user profile
 @router.get("/profile")
 def get_user_profile(current_user: User = Depends(get_current_user)):
+    """
+    Get the profile of the current user.
+
+    Args:
+        current_user (User): The current authenticated user.
+
+    Returns:
+        dict: The user's profile information.
+    """
     return {"name": current_user.name, "email": current_user.email}
