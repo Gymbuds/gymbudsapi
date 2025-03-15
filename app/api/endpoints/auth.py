@@ -95,7 +95,7 @@ async def request_password_reset(request: PasswordResetRequest, db: Session = De
     # Send reset token via email 
     await send_reset_email(email=email_lowercase, reset_token=reset_token)
     
-    return {"message": "Password reset email sent", "reset_token": reset_token}
+    return {"success": "Password reset email sent", "reset_token": reset_token}
 
 # Reset password after verifying token
 @router.post("/reset-password")
@@ -129,7 +129,7 @@ def reset_password(request: ResetPassword, db: Session = Depends(get_db)):
         user.hashed_password = hash_password(request.new_password)
         db.commit()
 
-        return {"message": "Password successfully reset."}
+        return {"success": "Password successfully reset."}
     except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Reset token has expired")
     except InvalidTokenError:
