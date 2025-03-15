@@ -65,6 +65,16 @@ def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogU
     db.refresh(db_workout)
     return db_workout
 
+def delete_workout_log(db: Session, log_id:int, user_id:int):
+    db_workout = db.query(WorkoutLog).filter(WorkoutLog.id == log_id, WorkoutLog.user_id == user_id).first()
+
+    if not db_workout:
+        return None  # Handle this in the route, returning 404 if not found
+    
+    db.delete(db_workout)
+    db.commit()  # Commit the transaction to delete the record
+    return db_workout
+
 # Fetch all workout logs for a given user by ID
 def get_workout_logs_by_user(db: Session, user_id: int):
     result = db.execute(select(WorkoutLog).where(WorkoutLog.user_id == user_id))
