@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models.user import User
 from app.schemas.user import UserCreate
-from app.core.security import hash_password, get_current_user, validate_password
+from app.core.security import hash_password, get_current_user, validate_password, create_access_token, create_refresh_token
 from app.db.repositories.user_repo import create_user
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -35,9 +35,16 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     
     # Create the user in the database with the lowercase email
     new_user = create_user(db=db, email=email_lowercase, password=hashed_password, name=user.name)
-    
-    return {"success": "User created successfully"}
 
+    # Create access and refresh tokens for the new user
+    access_token = create_access_token(data={"sub": email_lowercase})
+    refresh_token = create_refresh_token(data={"sub": email_lowercase})
+
+    # Store the hashed refresh token in DB
+    new_user.hashed_refresh_token = hash_password(refresh_token)
+    db.commit()
+    
+    return {"success": "User created successfully", "access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 # Get user profile
 @router.get("/profile")
