@@ -35,3 +35,9 @@ def get_availability_ranges_user(db: Session, user_id: int):
     """
     availability_ranges = db.query(AvailabilityRange).filter(AvailabilityRange.user_id == user_id).all()
     return availability_ranges
+
+def delete_aval_range(db:Session,aval_range_id:int):
+    db_item = db.query(AvailabilityRange).filter(AvailabilityRange.id == aval_range_id).first()
+    db.delete(db_item)
+    db.commit()
+    return {"message": "Avaliablity Range deleted successfully"}

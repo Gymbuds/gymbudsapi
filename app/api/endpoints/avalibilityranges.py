@@ -1,7 +1,7 @@
-from fastapi import APIRouter,Depends
-from app.schemas.range import AvalRangeCreate
+from fastapi import APIRouter,Depends,Body
+from app.schemas.range import AvalRangeCreate,AvalRangeDelete
 from app.db.models.user import User
-from app.db.crud.range_crud import create_avail_range,get_availability_ranges_user
+from app.db.crud.range_crud import create_avail_range,get_availability_ranges_user,delete_aval_range
 from app.core.security import get_current_user
 from app.db.session import get_db
 from sqlalchemy.orm import Session
@@ -19,3 +19,6 @@ async def get_aval_range(current_user: User = Depends(get_current_user),db: Sess
     user_id = current_user.id
     new_range = get_availability_ranges_user(db=db, user_id=user_id)
     return new_range
+@router.delete("")
+async def deleteAvailabilityRange(aval_range: AvalRangeDelete= Body(...), db: Session = Depends(get_db)):
+    return delete_aval_range(db=db, aval_range_id=aval_range.id)
