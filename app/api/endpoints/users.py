@@ -78,30 +78,3 @@ def get_user_profile(current_user: User = Depends(get_current_user)):
         dict: The user's profile information.
     """
     return {"name": current_user.name, "email": current_user.email}
-
-
-@router.get("/availability-ranges")
-def get_availability_ranges_for_user(user_email: str, db: Session = Depends(get_db)):
-    """
-    Get availability ranges for a user by email.
-
-    Args:
-        user_email (str): The email of the user.
-        db (Session): The database session.
-
-    Raises:
-        HTTPException: If the user does not exist.
-
-    Returns:
-        User: The user object.
-    """
-    email_lowercase = user_email.lower()
-    user = db.query(User).filter(User.email == email_lowercase).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User doesn't exist"
-        )
-    user_aval_ranges = get_availability_ranges_user(db=db,user_id=user.id)
-    return user_aval_ranges
-
