@@ -25,33 +25,29 @@ def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogU
     if not db_workout:
         return None
 
-    # Update fields if provided, otherwise retain existing values
+    # Update fields if provided
     if workout_log_update.title is not None:
         db_workout.title = workout_log_update.title
     if workout_log_update.type is not None:
         db_workout.type = workout_log_update.type.value
 
-    if workout_log_update.exercise_details is not None:
-        existing_exercises = db_workout.exercise_details
-        new_exercises = workout_log_update.exercise_details
+    if workout_log_update.exercise_details is not None or workout_log_update.delete_exercises is not None:
+        existing_exercises = db_workout.exercise_details  # List of existing exercises
+        new_exercises = workout_log_update.exercise_details or []  # Avoid None issues
 
-        # Create a dictionary of existing exercises by exercise name
+        # Convert existing exercises into a dictionary for easy lookup
         existing_exercise_dict = {e['exercise']: e for e in existing_exercises}
 
-        # Iterate through the new exercises
+        # Update or add exercises from new_exercises
         for new_exercise in new_exercises:
-            if new_exercise.exercise in existing_exercise_dict:
-                # If exercise exists, update it
-                existing_exercise_dict[new_exercise.exercise].update({
-                    'weight': new_exercise.weight,
-                    'sets': new_exercise.sets,
-                    'reps': new_exercise.reps
-                })
-            else:
-                # If exercise doesn't exist, add it to the dictionary
-                existing_exercise_dict[new_exercise.exercise] = new_exercise.dict()
+            existing_exercise_dict[new_exercise.exercise] = new_exercise.dict()
 
-        # Convert the updated dictionary back to a list
+        # Delete exercises if they are listed in `delete_exercises`
+        if workout_log_update.delete_exercises:
+            for exercise in workout_log_update.delete_exercises:
+                existing_exercise_dict.pop(exercise, None)  # Remove safely if it exists
+
+        # Convert dictionary back to a list
         db_workout.exercise_details = list(existing_exercise_dict.values())
 
     if workout_log_update.notes is not None:

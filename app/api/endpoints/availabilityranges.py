@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 @router.post("/create")
-async def createAvailabilityRange(aval_range: AvalRangeCreate,current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
+async def create_availability_range(aval_range: AvalRangeCreate,current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
     """
     Create a new availability range for a user.
 
@@ -28,7 +28,7 @@ async def createAvailabilityRange(aval_range: AvalRangeCreate,current_user: User
     new_range = create_avail_range(db=db, user_id=user_id, day_week=aval_range.day_of_week,start_time=aval_range.start_time,end_time=aval_range.end_time)
     return new_range
 @router.get("")
-async def get_aval_range(current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
+async def get_availability_range(current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
     """
     Get all availability ranges for a user.
 
@@ -43,7 +43,7 @@ async def get_aval_range(current_user: User = Depends(get_current_user),db: Sess
     new_range = get_availability_ranges_user(db=db, user_id=user_id)
     return new_range
 @router.delete("")
-async def deleteAvailabilityRange(aval_range: AvalRangeDelete= Body(...), current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
+async def delete_availability_range(aval_range: AvalRangeDelete= Body(...), current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
     """
     Delete an availability range for the authenticated user.
 

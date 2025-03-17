@@ -4,8 +4,8 @@ from typing import Optional, List
 from enum import Enum
 
 class LogMethod(str, Enum):
-    voice = "Voice"
     manual = "Manual"
+    voice = "Voice"
 
 class MoodType(str, Enum):
     energized = "Energized"
@@ -35,6 +35,7 @@ class WorkoutLogUpdate(BaseModel):
     title: Optional[str] = None
     type: Optional[LogMethod] = None
     exercise_details: Optional[List[ExerciseDetail]] = None
+    delete_exercises: Optional[List[str]] = None 
     notes: Optional[str] = None
     duration_minutes: Optional[int] = None
     mood: Optional[MoodType] = None
