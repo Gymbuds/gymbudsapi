@@ -2,6 +2,11 @@ from app.db.database import Base
 from sqlalchemy import Column,Integer,String,Float,Text,DateTime
 from sqlalchemy.orm import relationship
 import datetime
+import enum
+class SkillLevel(enum.Enum):
+    BEGINNER = "Beginner"
+    INTER = "Intermediate"
+    ADVANCED = "Advanced"
 class User(Base):
     __tablename__ = "users"
 
@@ -15,6 +20,8 @@ class User(Base):
     longitude = Column (Float,nullable=True)
     preferred_workout_goals = Column(Text,nullable = True)
     created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
-
+    age = Column(Integer,nullable=True)
+    skill_level = Column (SkillLevel,nullable=True)
+    
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")
