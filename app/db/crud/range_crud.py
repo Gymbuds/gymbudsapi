@@ -1,6 +1,7 @@
 from app.db.models.avalrange import AvailabilityRange
 from sqlalchemy.orm import Session
 from datetime import time
+from fastapi import HTTPException, status
 
 def create_avail_range(db: Session, user_id: int, start_time: time, end_time: time, day_week: str):
     """
@@ -36,8 +37,24 @@ def get_availability_ranges_user(db: Session, user_id: int):
     availability_ranges = db.query(AvailabilityRange).filter(AvailabilityRange.user_id == user_id).all()
     return availability_ranges
 
-def delete_aval_range(db:Session,aval_range_id:int):
-    db_item = db.query(AvailabilityRange).filter(AvailabilityRange.id == aval_range_id).first()
+def delete_aval_range(db:Session,aval_range_id:int, user_id:int):
+    """
+    Delete an availability range for the authenticated user.
+
+    Args:
+        aval_range_id (int): The ID of the availability range to be deleted.
+        db (Session): The database session.
+        current_user (User): The currently authenticated user.
+
+    Raises:
+        HTTPException: If the availability range is not found or the user is not authorized to delete it.
+
+    Returns:
+        AvailabilityRange: The deleted availability range.
+    """
+    db_item = db.query(AvailabilityRange).filter(AvailabilityRange.id == aval_range_id, AvailabilityRange.user_id==user_id).first()
+    if not db_item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Availability range not found")
     db.delete(db_item)
     db.commit()
-    return {"message": "Avaliablity Range deleted successfully"}
+    return {"message": "Avaliablity Range deleted successfully"}, db_item
