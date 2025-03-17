@@ -15,10 +15,13 @@ class MoodType(str, Enum):
     neutral = "Neutral"
 
 class ExerciseDetail(BaseModel):
-    exercise: str
+    exercise_name: str
     sets: int
     reps: int
     weight: Optional[float] = None
+
+class ExerciseDetailResponse(ExerciseDetail):
+    exercise_id: int
 
 class WorkoutLogBase(BaseModel):
     title: str
@@ -34,13 +37,14 @@ class WorkoutLogCreate(WorkoutLogBase):
 class WorkoutLogUpdate(BaseModel):
     title: Optional[str] = None
     type: Optional[LogMethod] = None
-    exercise_details: Optional[List[ExerciseDetail]] = None
-    delete_exercises: Optional[List[str]] = None 
+    exercise_details: Optional[List[ExerciseDetail]] = None 
+    delete_exercises: Optional[List[int]] = None  # IDs of exercises to delete
     notes: Optional[str] = None
     duration_minutes: Optional[int] = None
     mood: Optional[MoodType] = None
 
 class WorkoutLog(WorkoutLogBase):
     id: int
-    date: datetime
     user_id: int
+    exercise_details: List[ExerciseDetailResponse]
+    date: datetime
