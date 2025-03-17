@@ -17,3 +17,4 @@ class User(Base):
     created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
 
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
+    workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")

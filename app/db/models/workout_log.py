@@ -1,8 +1,9 @@
 from app.db.database import Base
 from sqlalchemy import Column,Integer,String,Float,DateTime,ForeignKey,Enum,JSON,Text
+from sqlalchemy.orm import relationship
 import datetime
 class WorkoutLog(Base):
-    __tablename__ = "workout_log"
+    __tablename__ = "workout_logs"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -13,3 +14,5 @@ class WorkoutLog(Base):
     duration_minutes = Column(Integer, nullable=False)
     mood = Column(Enum("Energized", "Tired", "Motivated", "Stressed", "Neutral", name="mood_type"), nullable=False)
     date = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
+    
+    user = relationship("User", back_populates="workout_logs")
