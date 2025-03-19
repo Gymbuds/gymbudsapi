@@ -3,13 +3,13 @@ from sqlalchemy.orm import relationship
 import enum
 from app.db.database import Base
 class DayOfWeek(enum.Enum):
-    Monday = "Monday"
-    Tuesday = "Tuesday"
-    Wednesday = "Wednesday"
-    Thursday = "Thursday"
-    Friday = "Friday"
-    Saturday = "Saturday"
-    Sunday = "Sunday"
+    Monday = "MONDAY"
+    Tuesday = "TUESDAY"
+    Wednesday = "WEDNESDAY"
+    Thursday = "THURSDAY"
+    Friday = "FRIDAY"
+    Saturday = "SATURDAY"
+    Sunday = "SUNDAY"
 class AvailabilityRange(Base):
     __tablename__ = "availability_ranges"
 

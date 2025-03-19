@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 import datetime
 import enum
 class SkillLevel(enum.Enum):
-    BEGINNER = "Beginner"
-    INTER = "Intermediate"
-    ADVANCED = "Advanced"
+    BEGINNER = "BEGINNER"
+    INTER = "INTERMEDIATE"
+    ADVANCED = "ADVANCED"
 class User(Base):
     __tablename__ = "users"
 
