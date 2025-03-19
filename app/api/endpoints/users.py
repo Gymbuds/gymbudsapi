@@ -2,15 +2,31 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import hash_password, get_current_user, validate_password, create_access_token, create_refresh_token
-from app.db.repositories.user_repo import create_user
+from app.db.crud.user_crud import create_user,update_user
 from sqlalchemy.orm import Session
+from app.core.security import get_current_user, hash_password, validate_password
+from app.db.models.user import User
 from app.db.session import get_db
+from app.schemas.user import UserCreate,UserUpdate
 
 router = APIRouter()
 
 # Register new user
 @router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Register a new user and generate an access token.
+
+    Args:
+        user (UserCreate): The user data to create.
+        db (Session): The database session.
+
+    Raises:
+        HTTPException: If the email is already registered or the password is invalid.
+
+    Returns:
+        dict: A success message.
+    """
     # Convert the input email to lowercase
     email_lowercase = user.email.lower()
 
@@ -49,4 +65,41 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 # Get user profile
 @router.get("/profile")
 def get_user_profile(current_user: User = Depends(get_current_user)):
+    """
+    Get the profile of the current user.
+
+    Args:
+        current_user (User): The current authenticated user.
+
+    Returns:
+        dict: The user's profile information.
+    """
     return {"name": current_user.name, "email": current_user.email}
+
+@router.patch("/profile/update")
+def update_profile(
+    user_update: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Update user profile information.
+    """
+    if not any([user_update.name, user_update.profile_picture, user_update.preferred_workout_goals, user_update.age, user_update.skill_level]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one field must be provided for update."
+        )
+    
+    update_user(
+        db=db,
+        name=user_update.name,
+        profile_picture=user_update.profile_picture,
+        preferred_workout_goals=user_update.preferred_workout_goals,
+        age=user_update.age,
+        skill_level=user_update.skill_level,
+        user = current_user
+    )
+    
+    
+    return {"success": "User profile updated successfully", "user": current_user}

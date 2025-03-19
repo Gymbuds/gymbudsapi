@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.db.session import check_db_connection  # Import the check_db_connection function
-
-from app.api.endpoints import users, auth
+from app.api.endpoints import users, auth, availabilityranges, workout_logs
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -12,7 +11,8 @@ load_dotenv()
 app = FastAPI(host="0.0.0.0", port=8000)
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-
+app.include_router(workout_logs.router, prefix="/workout_logs", tags=["workout_logs"])
+app.include_router(availabilityranges.router,prefix ="/avalrange", tags=["Availibility_range"])
 # CORS Middleware Configuration
 origins = [
     "http://localhost.tiangolo.com",
