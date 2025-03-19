@@ -6,6 +6,10 @@ from app.schemas.user import Login, RefreshToken, PasswordResetRequest, ResetPas
 from app.db.session import get_db
 from app.services.email_service import send_reset_email
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+
+import secrets, string
+reset_tokens = {}  # Simple in-memory store for mapping a short code to the full reset token
 
 router = APIRouter()
 
@@ -77,25 +81,36 @@ def logout_user(db: Session = Depends(get_db), user: User = Depends(get_current_
 # Request password reset
 @router.post("/request-password-reset")
 async def request_password_reset(request: PasswordResetRequest, db: Session = Depends(get_db)):
-    # Convert the input email to lowercase
     email_lowercase = request.email.lower()
-
-    # Get the user from the database
     user = db.query(User).filter(User.email == email_lowercase).first()
     
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
-    # Create a reset token for the user 
+    # Create the full JWT reset token (expires in 15 minutes)
     reset_token = create_password_reset_token(data={"sub": email_lowercase})
     
-    # Send reset token via email 
-    await send_reset_email(email=email_lowercase, reset_token=reset_token)
+    # Generate a short reset code (6-character alphanumeric)
+    short_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(6))
     
-    return {"success": "Password reset email sent", "reset_token": reset_token}
+    reset_tokens[short_code] = reset_token
+    
+    # Send reset code via email
+    await send_reset_email(email=email_lowercase, code=short_code)
+    
+    return {"success": "Password reset email sent", "reset_code": short_code}
+
+class VerifyResetCode(BaseModel):
+    code: str
+
+@router.post("/verify-reset-code")
+def verify_reset_code(request: VerifyResetCode):
+    token = reset_tokens.get(request.code)
+    if not token:
+        raise HTTPException(status_code=404, detail="Invalid or expired reset code")
+    # Remove the code once used (to prevent reuse)
+    reset_tokens.pop(request.code, None)
+    return {"token": token}
 
 # Reset password after verifying token
 @router.post("/reset-password")
