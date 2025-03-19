@@ -25,3 +25,4 @@ class User(Base):
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")
+    ai_advices = relationship("AIAdvice", back_populates="user", cascade="all, delete-orphan")
