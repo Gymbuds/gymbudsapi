@@ -1,5 +1,5 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String,Float,Text,DateTime
+from sqlalchemy import Column,Integer,String,Float,Text,DateTime,Enum
 from sqlalchemy.orm import relationship
 import datetime
 import enum
@@ -21,7 +21,7 @@ class User(Base):
     preferred_workout_goals = Column(Text,nullable = True)
     created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
     age = Column(Integer,nullable=True)
-    skill_level = Column (SkillLevel,nullable=True)
+    skill_level = Column(Enum(SkillLevel), nullable=True)
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")

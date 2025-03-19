@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-
+from app.db.models.user import SkillLevel
 # Schema for user registration
 class UserCreate(BaseModel):
     name: str
@@ -24,3 +24,9 @@ class ResetPassword(BaseModel):
     reset_token: str
     new_password: str
 
+class UserUpdate(BaseModel):
+    name: str | None = None
+    profile_picture: str | None = None
+    preferred_workout_goals: str | None = None
+    age: int | None = None 
+    skill_level: str | None = None 
