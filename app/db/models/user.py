@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 import datetime
 import enum
 class SkillLevel(enum.Enum):
-    BEGINNER = "Beginner"
-    INTER = "Intermediate"
-    ADVANCED = "Advanced"
+    BEGINNER = "BEGINNER"
+    INTER = "INTERMEDIATE"
+    ADVANCED = "ADVANCED"
 class User(Base):
     __tablename__ = "users"
 
@@ -25,3 +25,4 @@ class User(Base):
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")
+    ai_advices = relationship("AIAdvice", back_populates="user", cascade="all, delete-orphan")

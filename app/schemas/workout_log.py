@@ -4,15 +4,15 @@ from typing import Optional, List
 from enum import Enum
 
 class LogMethod(str, Enum):
-    manual = "Manual"
-    voice = "Voice"
+    MANUAL = "MANUAL"
+    VOICE = "VOICE"
 
 class MoodType(str, Enum):
-    energized = "Energized"
-    tired = "Tired"
-    motivated = "Motivated"
-    stressed = "Stressed"
-    neutral = "Neutral"
+    ENERGIZED = "ENERGIZED"
+    TIRED = "TIRED"
+    MOTIVATED = "MOTIVATED"
+    STRESSED = "STRESSED"
+    NEUTRAL = "NEUTRAL"
 
 class ExerciseDetail(BaseModel):
     exercise_name: str

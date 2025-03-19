@@ -27,11 +27,11 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
-        sa.Column('type', sa.Enum('Voice', 'Manual', name='log_method'), nullable=False),
+        sa.Column('type', sa.Enum('VOICE', 'MANUAL', name='log_method'), nullable=False),
         sa.Column('notes', sa.Text(), nullable=True),
         sa.Column('duration_minutes', sa.Integer(), nullable=False),
         sa.Column('date', sa.DateTime(), nullable=True, default=sa.func.now()),
-        sa.Column('mood', sa.Enum('Energized', 'Tired', 'Motivated', 'Stressed', 'Neutral', name='mood_type'), nullable=False),
+        sa.Column('mood', sa.Enum('ENERGIZED', 'TIRED', 'MOTIVATED', 'STRESSED', 'NEUTRAL', name='mood_type'), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE')  # Foreign key reference to users table
     )
