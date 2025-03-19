@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
-        sa.Column('type', sa.Enum('Voice', 'Manual', name='log_method'), nullable=False),
+        sa.Column('type', sa.Enum('VOICE', 'MANUAL', name='log_method'), nullable=False),
         sa.Column('notes', sa.Text(), nullable=True),
         sa.Column('duration_minutes', sa.Integer(), nullable=False),
         sa.Column('date', sa.DateTime(), nullable=True, default=sa.func.now()),
