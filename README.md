@@ -10,6 +10,7 @@ install pgadmin and postgresql
 -set up your poetry using: poetry install
 -if you need to install new packages do: poetry add [package name]
 -if you make changes to models: poetry run alembic revision --autogenerate -m
+-if you need to get to latest alembic migration: poetry run alembic upgrade head
 
 #
 
