@@ -18,10 +18,12 @@ def add_exercise(db: Session, workout_log_id: int, exercise_name: str, sets: int
     return new_exercise  # Return the full exercise object
 
 # Update existing exercises
-def update_exercise(db: Session, exercise_id: int, sets: Optional[int] = None, reps: Optional[int] = None, weight: Optional[float] = None) -> Optional[Exercise]:
+def update_exercise(db: Session, exercise_id: int, exercise_name: Optional[str] = None, sets: Optional[int] = None, reps: Optional[int] = None, weight: Optional[float] = None) -> Optional[Exercise]:
     db_exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
     
     if db_exercise:
+        if exercise_name is not None:
+            db_exercise.exercise_name = exercise_name
         if sets is not None:
             db_exercise.sets = sets
         if reps is not None:

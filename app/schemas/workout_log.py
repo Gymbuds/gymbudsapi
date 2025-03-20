@@ -37,7 +37,7 @@ class WorkoutLogCreate(WorkoutLogBase):
 class WorkoutLogUpdate(BaseModel):
     title: Optional[str] = None
     type: Optional[LogMethod] = None
-    exercise_details: Optional[List[ExerciseDetail]] = None 
+    exercise_details: Optional[List[ExerciseDetailResponse]] = None 
     delete_exercises: Optional[List[int]] = None  # IDs of exercises to delete
     notes: Optional[str] = None
     duration_minutes: Optional[int] = None
