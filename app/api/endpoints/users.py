@@ -74,7 +74,7 @@ def get_user_profile(current_user: User = Depends(get_current_user)):
     Returns:
         dict: The user's profile information.
     """
-    return {"name": current_user.name, "email": current_user.email}
+    return {"user": current_user}
 
 @router.patch("/profile/update")
 def update_profile(
