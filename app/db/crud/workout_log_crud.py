@@ -47,13 +47,10 @@ def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogU
     # Handle exercise updates
     if workout_log_update.exercise_details is not None:
         for exercise in workout_log_update.exercise_details:
-            exercise_id = getattr(exercise, "exercise_id", None)  # Avoid AttributeError if id is missing
-
-            if exercise_id:  # If exercise ID exists, update the existing exercise
-                db_exercise = db.query(Exercise).filter(Exercise.id == exercise_id, Exercise.workout_log_id == log_id).first()
+            if exercise.exercise_id:  # If exercise ID is provided, update the existing exercise
+                db_exercise = db.query(Exercise).filter(Exercise.id == exercise.exercise_id, Exercise.workout_log_id == log_id).first()
                 if db_exercise:
-                    update_exercise(db, exercise_id, exercise.exercise_name, exercise.sets, exercise.reps, exercise.weight)
-                    db.commit()
+                    update_exercise(db, exercise.exercise_id, exercise.exercise_name, exercise.sets, exercise.reps, exercise.weight)
             else:  # Otherwise, add a new exercise
                 add_exercise(db, db_workout.id, exercise.exercise_name, exercise.sets, exercise.reps, exercise.weight)
 
