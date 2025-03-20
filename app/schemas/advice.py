@@ -13,9 +13,10 @@ class AIAdviceType(str, Enum):
 
 class AIAdviceBase(BaseModel):
     advice_type: AIAdviceType
-    ai_feedback: Optional[str] = None
 
 class AIAdviceResponse(AIAdviceBase):
     id: int
+    advice_type: AIAdviceType
+    ai_feedback: str
     user_id: int
     created_at: datetime
