@@ -7,7 +7,7 @@ def create_user(db: Session, email: str, password: str, name: str) -> User:
     db.commit()
     db.refresh(db_user)
     return db_user
-def update_user(db:Session, name:str, profile_picture:str, preferred_workout_goals:str, age:int, skill_level:str,user:User):
+def update_user(db:Session, name:str, profile_picture:str, preferred_workout_goals:str, age:int, skill_level:str,weight:int,user:User):
     if name:
         user.name = name
     if profile_picture:
@@ -18,5 +18,7 @@ def update_user(db:Session, name:str, profile_picture:str, preferred_workout_goa
         user.age = age
     if skill_level:
         user.skill_level = skill_level
+    if weight:
+        user.weight = weight
     db.commit()
     db.refresh(user)
