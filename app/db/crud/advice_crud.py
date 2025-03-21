@@ -2,13 +2,14 @@ from sqlalchemy.orm import Session
 from app.db.models.ai_advice import AIAdvice
 from app.schemas.advice import AIAdviceBase
 from app.core.deepseek import deepSeekChat
-def create_advice(db: Session, user_id: int, advice: AIAdviceBase) -> AIAdvice:
+from app.db.models.user import User
+def create_advice(db: Session, user: User, advice: AIAdviceBase) -> AIAdvice:
 
-    deepSeekChat()
+    deepSeekChat(db=db,workout_type=advice.advice_type,user=user)
     
     ai_response = "test"
     db_advice = AIAdvice(
-        user_id=user_id,
+        user_id=user.id,
         ai_feedback = ai_response,
         advice_type=advice.advice_type,
     )

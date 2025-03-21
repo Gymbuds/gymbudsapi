@@ -11,4 +11,4 @@ router = APIRouter()
 # Create AI Advice
 @router.post("", response_model=AIAdviceResponse) 
 def create_ai_advice(advice: AIAdviceBase, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return create_advice(db, current_user.id, advice)
+    return create_advice(db, current_user, advice)
