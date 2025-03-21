@@ -29,7 +29,6 @@ async def deepSeekChat(db:Session,workout_type:str,user:User,):
         "weight": user.weight or None,
     }
     #health_data = some_func()
-    
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
         messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
                     "Based on the following information, provide personalized workout advice to help the user achieve their fitness goals. "
@@ -38,6 +37,31 @@ async def deepSeekChat(db:Session,workout_type:str,user:User,):
                     "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
                     {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
         ]
+    if workout_type==AIAdviceType.WORKOUT_OPTIMIZATION:
+        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
+                    "Based on the following information, provide personalized advice on how the user can optimize their workouts for better results."
+                    "If there is a variable with the value 'None', ignore it. "
+                    "This will be a singular response don't say a message allowing the user to respond"
+                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+                    {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
+        ]
+    if workout_type==AIAdviceType.GOAL_ALIGNMENT:
+        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
+                    "Based on the following information, analyze how well the user's workouts align with their goals and provide personalized advice."
+                    "If there is a variable with the value 'None', ignore it. "
+                    "This will be a singular response don't say a message allowing the user to respond"
+                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+                    {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
+        ]
+    if workout_type==AIAdviceType.MUSCLE_BALANCE:
+        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
+                    "Based on the following information, analyze how well the user's current workout routine balances their muscle groups in relation to their fitness goals, body type, and preferences. Provide personalized advice on how they can improve their muscle balance to achieve better overall fitness and alignment with their specific needs."
+                    "If there is a variable with the value 'None', ignore it. "
+                    "This will be a singular response don't say a message allowing the user to respond"
+                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+                    {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
+        ]
+
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=messages,
