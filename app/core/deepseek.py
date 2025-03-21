@@ -5,11 +5,10 @@ from dotenv import load_dotenv
 from app.schemas.advice import AIAdviceType
 from app.db.crud.workout_log_crud import get_workout_logs_by_user_latest
 from app.db.models.user import User
-import json
 load_dotenv()
 
 
-def deepSeekChat(db:Session,workout_type:str,user:User,):
+async def deepSeekChat(db:Session,workout_type:str,user:User,):
     client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
     user_workouts = get_workout_logs_by_user_latest(db=db,user_id=user.id,latest_amt_days=30)
     parsed_user_workouts = []
@@ -24,26 +23,28 @@ def deepSeekChat(db:Session,workout_type:str,user:User,):
     
     user_preferences  = {
         "name": user.name,
-        "preferred_workout_goals" :user.preferred_workout_goals,
-        "age": user.age,
-        "skill_level":user.skill_level
+        "preferred_workout_goals" :user.preferred_workout_goals or None,
+        "age": user.age or None,
+        "skill_level":user.skill_level.value or None,
+        "weight": user.weight or None,
     }
     #health_data = some_func()
+    
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
         messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
-                    "Based on the following information, provide personalized workout advice to help the user achieve their fitness goals."},
+                    "Based on the following information, provide personalized workout advice to help the user achieve their fitness goals. "
+                    "If there is a variable with the value 'None', ignore it. "
+                    "This will be a singular response don't say a message allowing the user to respond"
+                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
                     {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
         ]
     response = client.chat.completions.create(
         model="deepseek-chat",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "please add 1+1"},
-        ],
+        messages=messages,
         stream=False
     )
-    print(response.choices[0])
-    # print("content",response.choices[0].message.content)
+    # print(response.choices[0])
+    return response.choices[0].message.content
     
 
 
