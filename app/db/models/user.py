@@ -5,7 +5,7 @@ import datetime
 import enum
 class SkillLevel(enum.Enum):
     BEGINNER = "BEGINNER"
-    INTER = "INTERMEDIATE"
+    INTERMEDIATE = "INTERMEDIATE"
     ADVANCED = "ADVANCED"
 class User(Base):
     __tablename__ = "users"
