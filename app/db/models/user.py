@@ -22,6 +22,8 @@ class User(Base):
     created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
     age = Column(Integer,nullable=True)
     skill_level = Column(Enum(SkillLevel), nullable=True)
+    weight = Column(Integer,nullable=True)
+
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")

@@ -30,3 +30,4 @@ class UserUpdate(BaseModel):
     preferred_workout_goals: str | None = None
     age: int | None = None 
     skill_level: str | None = None 
+    weight: int | None = None
