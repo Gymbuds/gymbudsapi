@@ -7,7 +7,6 @@ from app.schemas.health_data import HealthDataCreate
 def create_health_data(db: Session, user_id: int, health_data: HealthDataCreate) -> HealthData:
     db_health = HealthData(
         user_id=user_id, 
-        date=health_data.date,
         steps=health_data.steps,
         calories_burnt=health_data.calories_burnt,
         avg_heart_rate=health_data.avg_heart_rate,

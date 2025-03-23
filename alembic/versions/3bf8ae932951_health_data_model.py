@@ -1,8 +1,8 @@
 """health data model
 
-Revision ID: 0fca0732a044
-Revises: cca838310d91
-Create Date: 2025-03-21 18:32:50.370058
+Revision ID: 3bf8ae932951
+Revises: c756f3f78652
+Create Date: 2025-03-23 17:35:13.965034
 
 """
 from typing import Sequence, Union
@@ -12,10 +12,11 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '0fca0732a044'
-down_revision: Union[str, None] = 'cca838310d91'
+revision: str = '3bf8ae932951'
+down_revision: Union[str, None] = 'c756f3f78652'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+
 
 
 def upgrade() -> None:
