@@ -7,10 +7,6 @@ class SkillLevel(enum.Enum):
     BEGINNER = "BEGINNER"
     INTER = "INTERMEDIATE"
     ADVANCED = "ADVANCED"
-class Gender(enum.Enum):
-    MALE = "MALE"
-    FEMALE = "FEMALE"
-    OTHER = "OTHER"
 class User(Base):
     __tablename__ = "users"
 
