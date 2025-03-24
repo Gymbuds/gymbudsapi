@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.security import get_current_user, hash_password, validate_password
 from app.db.models.user import User
 from app.db.session import get_db
-from app.schemas.user import UserCreate,UserUpdate
-
+from app.schemas.user import UserCreate,UserUpdate,UserUpdateLocation
 router = APIRouter()
 
 # Register new user
@@ -103,3 +102,17 @@ def update_profile(
     
     
     return {"success": "User profile updated successfully", "user": current_user}
+@router.patch("/profile/location")
+def update_user_location(
+    location: UserUpdateLocation,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Update user location information.
+    """
+    current_user.longitude = location.longitude
+    current_user.latitude = location.latitude
+    db.commit()
+    
+    return {"success": "User location updated successfully", "user": current_user}
