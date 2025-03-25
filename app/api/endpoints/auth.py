@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import verify_password, create_access_token, create_refresh_token, decode_access_token, get_current_user, hash_password, create_password_reset_token, validate_password
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.db.models.user import User
-from app.schemas.user import Login, RefreshToken, PasswordResetRequest, ResetPassword
+from app.schemas.user import Login, RefreshToken, PasswordResetRequest, ResetPassword, AuthToken
 from app.db.session import get_db
 from app.services.email_service import send_reset_email
 from sqlalchemy.orm import Session
@@ -213,3 +213,6 @@ def reset_password(request: ResetPassword, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Reset token has expired")
     except InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid reset token")
+@router.post("/check-auth")
+def check_auth_token_state(request:AuthToken, db: Session = Depends(get_db)):
+        return decode_access_token(request.auth_token)

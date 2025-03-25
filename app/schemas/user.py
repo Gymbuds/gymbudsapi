@@ -23,7 +23,8 @@ class PasswordResetRequest(BaseModel):
 class ResetPassword(BaseModel):
     reset_token: str
     new_password: str
-
+class AuthToken(BaseModel):
+    auth_token:str
 class UserUpdate(BaseModel):
     name: str | None = None
     profile_picture: str | None = None
