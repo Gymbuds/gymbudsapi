@@ -28,9 +28,9 @@ def upgrade() -> None:
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('date', sa.Date(), nullable=True),
         sa.Column('steps', sa.Integer(), nullable=False, default=0),
-        sa.Column('calories_burnt', sa.Integer(), nullable=False, default=0),
+        sa.Column('calories_burnt', sa.Float(), nullable=False, default=0),
         sa.Column('avg_heart_rate', sa.Integer(), nullable=True),
-        sa.Column('sleep_duration', sa.Integer(), nullable=True),
+        sa.Column('sleep_duration', sa.Float(), nullable=True),
         sa.Column('active_mins', sa.Integer(), nullable=False, default=0),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE')

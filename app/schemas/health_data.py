@@ -4,9 +4,9 @@ from typing import Optional
 
 class HealthDataCreate(BaseModel):
     steps: int
-    calories_burnt: int
+    calories_burnt: float
     avg_heart_rate: Optional[int] = None
-    sleep_duration: Optional[int] = None
+    sleep_duration: Optional[float] = None
     active_mins: int
 
 class HealthDataResponse(HealthDataCreate):

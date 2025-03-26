@@ -17,13 +17,3 @@ def create_health_data(db: Session, user_id: int, health_data: HealthDataCreate)
     db.commit()
     db.refresh(db_health)
     return db_health
-
-#Retrieve the last 30 days of health data for a user
-def get_last_30_days(db: Session, user_id: int):
-    thirty_days_ago = datetime.utcnow().date() - timedelta(days=30)
-    return (
-        db.query(HealthData)
-        .filter(HealthData.user_id == user_id, HealthData.date >= thirty_days_ago)
-        .order_by(HealthData.date.desc())
-        .all()
-    )
