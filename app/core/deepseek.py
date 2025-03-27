@@ -8,7 +8,7 @@ from app.db.models.user import User
 load_dotenv()
 
 
-async def deepSeekChat(db:Session,workout_type:str,user:User,):
+async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_data: bool):
     client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
     user_workouts = get_workout_logs_by_user_latest(db=db,user_id=user.id,latest_amt_days=30)
     parsed_user_workouts = []
@@ -23,11 +23,13 @@ async def deepSeekChat(db:Session,workout_type:str,user:User,):
     
     user_preferences  = {
         "name": user.name,
-        "preferred_workout_goals" :user.preferred_workout_goals or None,
-        "age": user.age or None,
-        "skill_level":user.skill_level.value or None,
-        "weight": user.weight or None,
+        "preferred_workout_goals" : user.preferred_workout_goals if user.preferred_workout_goals else None,
+        "age": user.age if user.age else  None,
+        "skill_level": user.skill_level.value  if user.skill_level.value else  None,
+        "weight": user.weight if user.weight else  None,
     }
+    if use_health_data:
+        pass
     #health_data = some_func()
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
         messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."

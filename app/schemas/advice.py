@@ -13,8 +13,9 @@ class AIAdviceType(str, Enum):
 
 class AIAdviceBase(BaseModel):
     advice_type: AIAdviceType
+    health_data:bool
 
-class AIAdviceResponse(AIAdviceBase):
+class AIAdviceResponse(BaseModel):
     id: int
     advice_type: AIAdviceType
     ai_feedback: str
