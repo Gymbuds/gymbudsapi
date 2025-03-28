@@ -21,30 +21,34 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
             ]
         parsed_user_workouts.append(workout_dict)
     
+    if (user.skill_level):
+        skill_level = user.skill_level.value 
+    else:
+        skill_level = None
     user_preferences  = {
         "name": user.name,
         "preferred_workout_goals" : user.preferred_workout_goals if user.preferred_workout_goals else None,
         "age": user.age if user.age else  None,
-        "skill_level": user.skill_level.value  if user.skill_level.value else  None,
+        "skill_level":  skill_level,
         "weight": user.weight if user.weight else  None,
     }
     if use_health_data:
         pass
+    ai_preferences = """If there is a variable with the value 'None', ignore it. 
+                    This will be a singular response don't say a message allowing the user to respond
+                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers
+                    "Dont say my name or the workout type just get into it"""
     #health_data = some_func()
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
-        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
-                    "Based on the following information, provide personalized workout advice to help the user achieve their fitness goals. "
-                    "If there is a variable with the value 'None', ignore it. "
-                    "This will be a singular response don't say a message allowing the user to respond"
-                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences.
+                    Based on the following information, provide personalized workout advice to help the user achieve their fitness goals. 
+                    {ai_preferences}"""},
                     {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
         ]
     if workout_type==AIAdviceType.WORKOUT_OPTIMIZATION:
-        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
-                    "Based on the following information, provide personalized advice on how the user can optimize their workouts for better results."
-                    "If there is a variable with the value 'None', ignore it. "
-                    "This will be a singular response don't say a message allowing the user to respond"
-                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences.
+                    "Based on the following information, provide personalized advice on how the user can optimize their workouts for better results.
+                    {ai_preferences}"""},
                     {"role": "user", "content": f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}"},
         ]
     if workout_type==AIAdviceType.GOAL_ALIGNMENT:
