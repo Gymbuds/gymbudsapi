@@ -8,7 +8,7 @@ from app.db.models.user import User
 
 router = APIRouter()
 
-@router.post("/", response_model=HealthDataResponse)
+@router.post("", response_model=HealthDataResponse)
 def create_user_health_data(
     health_data: HealthDataCreate,
     db: Session = Depends(get_db),
@@ -24,7 +24,7 @@ def get_user_health_data(
 ):
     return get_health_data_by_date(db, current_user.id, date)
 
-@router.patch("/{health_id}/", response_model=HealthDataResponse)
+@router.patch("/{health_id}", response_model=HealthDataResponse)
 def update_user_health_data(
     health_id: int,
     health_data: HealthDataCreate,
