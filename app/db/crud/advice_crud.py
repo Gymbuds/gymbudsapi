@@ -25,3 +25,13 @@ def get_advices(db:Session,user:User):
         user_id = advice.user_id,
         created_at = advice.created_at,
     ) for advice in ai_advices]
+
+def get_advice_by_id(db:Session,advice_id: int):
+    ai_advice = db.query(AIAdvice).filter(AIAdvice.id==advice_id).first()
+    return AIAdviceResponse(
+        id=ai_advice.id,
+        advice_type=ai_advice.advice_type,
+        ai_feedback=ai_advice.ai_feedback,
+        user_id = ai_advice.user_id,
+        created_at = ai_advice.created_at,
+    )
