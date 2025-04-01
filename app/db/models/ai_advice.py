@@ -1,5 +1,5 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String,Enum,DateTime,ForeignKey
+from sqlalchemy import Column,Integer,String,Enum,DateTime,ForeignKey,Boolean
 from sqlalchemy.orm import relationship
 import datetime
 from app.schemas.advice import AIAdviceType
@@ -10,5 +10,7 @@ class AIAdvice(Base):
     advice_type=Column(Enum(AIAdviceType),nullable=False)
     ai_feedback=Column(String,nullable=True)
     created_at=Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
-    
+    workout_earliest_date = Column(DateTime)
+    workout_latest_date= Column(DateTime)
+    contains_health_data = Column(Boolean)
     user = relationship("User",back_populates="ai_advices")

@@ -4,12 +4,15 @@ from app.schemas.advice import AIAdviceBase,AIAdviceResponse
 from app.core.deepseek import deepSeekChat
 from app.db.models.user import User
 async def create_advice(db: Session, user: User, advice: AIAdviceBase) -> AIAdvice:
-    ai_response = await deepSeekChat(db=db,workout_type=advice.advice_type,user=user,use_health_data=advice.health_data)
+    ai_response,workout_earliest,workout_latest= await deepSeekChat(db=db,workout_type=advice.advice_type,user=user,use_health_data=advice.health_data)
     print(ai_response)
     db_advice = AIAdvice(
         user_id=user.id,
         ai_feedback = ai_response,
         advice_type=advice.advice_type,
+        workout_earliest_date = workout_earliest,
+        workout_latest_date= workout_latest,
+        contains_health_data=advice.health_data
     )
     db.add(db_advice)
     db.commit()
@@ -24,6 +27,9 @@ def get_advices(db:Session,user:User):
         ai_feedback=advice.ai_feedback,
         user_id = advice.user_id,
         created_at = advice.created_at,
+        workout_earliest_date = advice.workout_earliest_date,
+        workout_latest_date= advice.workout_latest_date,
+        contains_health_data=advice.contains_health_data,
     ) for advice in ai_advices]
 
 def get_advice_by_id(db:Session,advice_id: int):
@@ -34,4 +40,7 @@ def get_advice_by_id(db:Session,advice_id: int):
         ai_feedback=ai_advice.ai_feedback,
         user_id = ai_advice.user_id,
         created_at = ai_advice.created_at,
+        workout_earliest_date = ai_advice.workout_earliest_date,
+        workout_latest_date= ai_advice.workout_latest_date,
+        contains_health_data=ai_advice.contains_health_data
     )

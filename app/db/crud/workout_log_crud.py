@@ -98,8 +98,10 @@ def get_workout_logs_by_user(db: Session, user_id: int):
     return workout_logs
 def get_workout_logs_by_user_latest(db:Session,user_id:int,latest_amt_days:int):
     date_threshold = datetime.now() - timedelta(days=latest_amt_days) # calculate how far back we need to go for users workouts
-    print(date_threshold)
-    workout_logs = db.query(WorkoutLog).filter(WorkoutLog.user_id == user_id and  WorkoutLog.date > date_threshold).all()
+    workout_query = db.query(WorkoutLog).filter(WorkoutLog.user_id==user_id,WorkoutLog.date > date_threshold)
+    workout_logs = workout_query.all()
+    earliest_date = workout_query.order_by(WorkoutLog.date).first().date if workout_query.count() > 0 else None
+    latest_date = workout_query.order_by(WorkoutLog.date.desc()).first().date if workout_query.count() > 0 else None
     for workout_log in workout_logs:
         workout_log.exercise_details = get_exercises_by_workout(db, workout_log.id)
-    return workout_logs
+    return workout_logs,earliest_date,latest_date

@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from datetime import datetime, timezone
 from app.db.models.health_data import HealthData
 from app.schemas.health_data import HealthDataCreate, HealthDataResponse
-
+from datetime import timedelta,datetime
 #Create a new health data entry
 def create_health_data(db: Session, user_id: int, health_data: HealthDataCreate) -> HealthData:
     db_health = HealthData(
@@ -50,3 +50,11 @@ def update_health_data(db: Session, health_id: int, user_id: int, health_data: H
     db.refresh(health_entry)
 
     return health_entry
+def get_health_data_by_user_latest(db:Session,user_id:int,latest_amt_days:int):
+    date_threshold = datetime.now() - timedelta(days=latest_amt_days) # calculate how far back we need to go for users workouts
+    health_datas = db.query(HealthData).filter(HealthData.user_id == user_id,HealthData.date > date_threshold).all()
+    # earliest_date = db.query(HealthData).filter(
+    #     HealthData.user_id == user_id,
+    #     HealthData.date > date_threshold
+    # ).order_by(HealthData.date).first().date
+    return health_datas
