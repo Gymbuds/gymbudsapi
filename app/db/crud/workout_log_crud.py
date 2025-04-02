@@ -43,6 +43,12 @@ def update_workout_log(db: Session, log_id: int, workout_log_update: WorkoutLogU
         db_workout.title = workout_log_update.title
     if workout_log_update.type is not None:
         db_workout.type = workout_log_update.type.value
+    if workout_log_update.notes is not None:
+        db_workout.notes = workout_log_update.notes
+    if workout_log_update.duration_minutes is not None:
+        db_workout.duration_minutes = workout_log_update.duration_minutes
+    if workout_log_update.mood is not None:
+        db_workout.mood = workout_log_update.mood.value
 
     # Handle exercise updates
     if workout_log_update.exercise_details is not None:
