@@ -40,8 +40,11 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
         
     ai_preferences = """If there is a variable with the value 'None', ignore it. 
                     This will be a singular response don't say a message allowing the user to respond
-                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers
-                    "Dont say my name or the workout type just get into it"""
+                    This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers
+                    Do not mention the user's name, workout type, or any titles—just provide the analysis immediately.  
+                    Do not include any introductions, summaries, or acknowledgments.  
+                    Only output the core advice and insights with no extra context.
+                    """
     user_info = f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}," + f"User Health Data {parsed_health_datas}" if use_health_data else ""
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
         messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences.
@@ -56,19 +59,27 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
                     {"role": "user", "content": f"{user_info}"},
         ]
     if workout_type==AIAdviceType.GOAL_ALIGNMENT:
-        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences."
                     "Based on the following information, analyze how well the user's workouts align with their goals and provide personalized advice."
-                    "If there is a variable with the value 'None', ignore it. "
-                    "This will be a singular response don't say a message allowing the user to respond"
-                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+                    {ai_preferences}"""},
                     {"role": "user", "content": f"{user_info}"},
         ]
     if workout_type==AIAdviceType.MUSCLE_BALANCE:
-        messages = [{"role":"system","content":"You are a fitness coach analyzing a user's workout logs and preferences."
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences."
                     "Based on the following information, analyze how well the user's current workout routine balances their muscle groups in relation to their fitness goals, body type, and preferences. Provide personalized advice on how they can improve their muscle balance to achieve better overall fitness and alignment with their specific needs."
-                    "If there is a variable with the value 'None', ignore it. "
-                    "This will be a singular response don't say a message allowing the user to respond"
-                    "This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers"},
+                    {ai_preferences}"""},
+                    {"role": "user", "content": f"{user_info}"},
+        ]
+    if workout_type == AIAdviceType.RECOVERY_ANALYSIS:
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences."
+                    "Based on the following information, evaluate the user's data  and provide personalized advice on how to optimize their rest, sleep, and recovery techniques to enhance performance and prevent overtraining. "
+                    {ai_preferences}"""},
+                    {"role": "user", "content": f"{user_info}"},
+        ]
+    if workout_type == AIAdviceType.PERFORMANCE_TRENDS:
+        messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences."
+                    "Based on the following information, Analyze the user's workout logs to identify performance trends over time, highlighting strengths, weaknesses, and areas for improvement."
+                    {ai_preferences}"""},
                     {"role": "user", "content": f"{user_info}"},
         ]
     response = client.chat.completions.create(
