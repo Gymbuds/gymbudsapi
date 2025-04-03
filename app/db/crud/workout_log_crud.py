@@ -3,7 +3,9 @@ from app.db.models.exercise import Exercise
 from sqlalchemy.orm import Session
 from app.schemas.workout_log import WorkoutLogCreate, WorkoutLogUpdate
 from typing import Optional
+from datetime import datetime, timedelta
 from app.db.crud.exercise_crud import add_exercise, update_exercise, delete_exercise, delete_exercises_by_workout_log, get_exercises_by_workout
+
 
 # Create a workout log for an authenticated user
 def create_workout_log(db: Session, workout_log_create: WorkoutLogCreate, user_id: int) -> WorkoutLog:
@@ -100,3 +102,12 @@ def get_workout_logs_by_user(db: Session, user_id: int):
         workout_log.exercise_details = get_exercises_by_workout(db, workout_log.id)
 
     return workout_logs
+def get_workout_logs_by_user_latest(db:Session,user_id:int,latest_amt_days:int):
+    date_threshold = datetime.now() - timedelta(days=latest_amt_days) # calculate how far back we need to go for users workouts
+    workout_query = db.query(WorkoutLog).filter(WorkoutLog.user_id==user_id,WorkoutLog.date > date_threshold)
+    workout_logs = workout_query.all()
+    earliest_date = workout_query.order_by(WorkoutLog.date).first().date if workout_query.count() > 0 else None
+    latest_date = workout_query.order_by(WorkoutLog.date.desc()).first().date if workout_query.count() > 0 else None
+    for workout_log in workout_logs:
+        workout_log.exercise_details = get_exercises_by_workout(db, workout_log.id)
+    return workout_logs,earliest_date,latest_date

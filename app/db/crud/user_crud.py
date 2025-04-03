@@ -21,4 +21,4 @@ def update_user(db:Session, name:str, profile_picture:str, preferred_workout_goa
     if weight:
         user.weight = weight
     db.commit()
-    db.refresh(user)
+    db.refresh(user)    

@@ -13,9 +13,14 @@ class AIAdviceType(str, Enum):
 
 class AIAdviceBase(BaseModel):
     advice_type: AIAdviceType
-    ai_feedback: Optional[str] = None
+    health_data:bool
 
-class AIAdviceResponse(AIAdviceBase):
+class AIAdviceResponse(BaseModel):
     id: int
+    advice_type: AIAdviceType
+    ai_feedback: str
     user_id: int
     created_at: datetime
+    workout_earliest_date: datetime
+    workout_latest_date: datetime
+    contains_health_data:bool
