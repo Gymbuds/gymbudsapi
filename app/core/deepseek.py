@@ -13,6 +13,7 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
     client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
     user_workouts,workout_earliest,workout_latest= get_workout_logs_by_user_latest(db=db,user_id=user.id,latest_amt_days=30)
     parsed_user_workouts = []
+    parsed_health_datas = []
     for workout in user_workouts:
         workout_dict = workout.__dict__
         workout_dict.pop('_sa_instance_state', None) # notn eeded
@@ -34,10 +35,12 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
         "weight": user.weight if user.weight else  None,
     }
     if use_health_data:
-        health_datas= get_health_data_by_user_latest(db,user.id,30)
-        parsed_health_datas = [health_data.__dict__ for health_data in health_datas]
-    
-        
+        health_datas = get_health_data_by_user_latest(db, user.id, 30)
+        for health_data in health_datas:
+            health_data_dict = health_data.__dict__
+            health_data_dict.pop('_sa_instance_state', None)  
+            health_data_dict = {key: value for key, value in health_data_dict.items() if value != 0}
+            parsed_health_datas.append(health_data_dict)
     ai_preferences = """If there is a variable with the value 'None', ignore it. 
                     This will be a singular response don't say a message allowing the user to respond
                     This will go into a react native text box format the response to fit as text seperated by paragraphs or sections with headers
@@ -45,7 +48,8 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
                     Do not include any introductions, summaries, or acknowledgments.  
                     Only output the core advice and insights with no extra context.
                     """
-    user_info = f"User Preferences: {user_preferences},User Workout Logs: {parsed_user_workouts}," + f"User Health Data {parsed_health_datas}" if use_health_data else ""
+    stringed_parsed_health_datas = f", User Health Data {parsed_health_datas}" if use_health_data else ""
+    user_info = f"User's Preferences and Details: {user_preferences}, User's Workout Logs: {parsed_user_workouts}{stringed_parsed_health_datas}"
     if workout_type==AIAdviceType.WORKOUT_ADVICE:
         messages = [{"role":"system","content":f"""You are a fitness coach analyzing a user's workout logs and preferences.
                     Based on the following information, provide personalized workout advice to help the user achieve their fitness goals. 
