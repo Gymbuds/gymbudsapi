@@ -58,3 +58,6 @@ def get_health_data_by_user_latest(db:Session,user_id:int,latest_amt_days:int):
     #     HealthData.date > date_threshold
     # ).order_by(HealthData.date).first().date
     return health_datas
+def get_all_health_data_by_id(db:Session,user_id:int):
+    health_datas = db.query(HealthData).where(HealthData.user_id==user_id).all()
+    return health_datas        
