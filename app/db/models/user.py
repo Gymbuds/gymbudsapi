@@ -29,3 +29,4 @@ class User(Base):
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")
     ai_advices = relationship("AIAdvice", back_populates="user", cascade="all, delete-orphan")
     health_datas = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
+    community_posts = relationship("CommunityPost", back_populates="user", cascade="all, delete-orphan")
