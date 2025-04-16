@@ -2,9 +2,10 @@ from fastapi import Depends,APIRouter
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.schemas.post import CommunityPostCreate,CommunityPostUpdate,CommunityPostResponse
-from app.db.crud.com_post_crud import create_post,update_post,delete_post
+from app.db.crud.com_post_crud import create_post,update_post,delete_post,get_posts_by_community
 from app.core.security import get_current_user 
 from app.db.models.user import User
+from typing import List
 router=APIRouter()
 
 @router.post("", response_model=CommunityPostResponse)
@@ -27,3 +28,7 @@ def update_community_post(
 @router.delete("/{post_id}")
 def delete_community_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return delete_post(db, current_user.id, post_id)
+
+@router.get("/community/{community_id}", response_model=List[CommunityPostResponse])
+def list_posts_for_community(community_id: int, db: Session = Depends(get_db)):
+    return get_posts_by_community(db, community_id)

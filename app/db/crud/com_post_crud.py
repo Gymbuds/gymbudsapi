@@ -45,3 +45,9 @@ def delete_post(db: Session, user_id: int, post_id: int) -> None:
     
     db.delete(post)
     db.commit()
+
+def get_posts_by_community(db: Session, community_id: int):
+    community = db.query(Community).filter(Community.id == community_id).first()
+    if not community:
+        raise HTTPException(status_code=404, detail="Community not found")
+    return db.query(CommunityPost).filter(CommunityPost.community_id == community_id).all()
