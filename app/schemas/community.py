@@ -6,6 +6,5 @@ class CommunityCreate(BaseModel):
     latitude : float
     longitude : float
     places_id :str
-    
 
 
