@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from app.db.models.community import Community
 
-def create_community(db:Session,name:str,address:str,latitude:float,longitude:float):
-    community = Community(name=name,address=address,latitude=latitude,longitude=longitude)
+def create_community(db:Session,name:str,address:str,latitude:float,longitude:float,places_id:str):
+    community = Community(name=name,address=address,latitude=latitude,longitude=longitude,places_id=places_id)
     db.add(community)
     db.commit()
     db.refresh(community)

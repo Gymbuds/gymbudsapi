@@ -9,6 +9,6 @@ router = APIRouter()
 def handle_community_request(community_body:CommunityCreate,db: Session = Depends(get_db)):
     community = get_community_by_address(db,community_body.address)
     if community is  None:
-        create_community(db,community_body.name,community_body.address,community_body.latitude,community_body.longitude)
+        create_community(db,community_body.name,community_body.address,community_body.latitude,community_body.longitude,community_body.places_id)
         community =get_community_by_address(db,community_body.address)
     return community

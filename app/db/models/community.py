@@ -12,3 +12,4 @@ class Community(Base):
 
 
     community_posts = relationship("CommunityPost", back_populates="gym_community", cascade="all, delete-orphan")
+    places_id = Column(String,nullable=True)

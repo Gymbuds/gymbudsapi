@@ -27,6 +27,7 @@ def upgrade() -> None:
     sa.Column('address',sa.String(),nullable=False),
     sa.Column('latitude', sa.Float(), nullable=True),
     sa.Column('longitude', sa.Float(), nullable=True),
+    sa.Column('places_id', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
