@@ -26,10 +26,10 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('community_id', sa.Integer(), nullable=False),
+        sa.Column('title', sa.String(), nullable=False),
         sa.Column('content', sa.Text(), nullable=False),
         sa.Column('image_url', sa.String(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('likes_count', sa.Integer(), nullable=False, server_default='0'),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['community_id'], ['gym_communities.id'], ondelete='CASCADE')

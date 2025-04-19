@@ -12,6 +12,7 @@ def create_post(db: Session, user_id: int, post: CommunityPostCreate) -> Communi
     db_post = CommunityPost(
         user_id=user_id,
         community_id=post.community_id,
+        title=post.title,
         content=post.content,
         image_url=post.image_url
     )
@@ -27,6 +28,8 @@ def update_post(db: Session, user_id: int, post_id: int, post_update: CommunityP
     if post.user_id != user_id:
         raise HTTPException(status_code=403, detail="Not authorized to update this post")
     
+    if post_update.title is not None:
+        post.title = post_update.title
     if post_update.content is not None:
         post.content = post_update.content
     if post_update.image_url is not None:
