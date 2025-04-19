@@ -30,3 +30,5 @@ class User(Base):
     ai_advices = relationship("AIAdvice", back_populates="user", cascade="all, delete-orphan")
     health_datas = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
     community_posts = relationship("CommunityPost", back_populates="user", cascade="all, delete-orphan")
+    post_likes = relationship("PostLike", back_populates="user", cascade="all, delete-orphan")
+    post_comments = relationship("PostComment", back_populates="user", cascade="all, delete-orphan")

@@ -15,3 +15,5 @@ class CommunityPost(Base):
 
     user = relationship("User", back_populates="community_posts")
     gym_community = relationship("Community", back_populates="community_posts")
+    post_likes = relationship("PostLike", back_populates="community_post", cascade="all, delete-orphan")
+    post_comments = relationship("PostComment", back_populates="community_post", cascade="all, delete-orphan")
