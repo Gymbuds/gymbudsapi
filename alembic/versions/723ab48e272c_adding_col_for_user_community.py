@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.add_column(
-        'gym_communities',
+        'user_communities',
         sa.Column(
             'is_preferred_gym',
             sa.Boolean(),
@@ -29,4 +29,7 @@ def upgrade() -> None:
             server_default=sa.text('false')  
         )
     )
-    op.alter_column('gym_communities', 'is_preferred_gym', server_default=None)
+    op.alter_column('user_communities', 'is_preferred_gym', server_default=None)
+def downgrade() -> None:
+    """downgrade"""
+    op.drop_column("user_communities",'is_preferred_gym')

@@ -21,7 +21,7 @@ def user_join_community(db:Session,community_id:int,user_id:int):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User is already a member of this community."
         )
-    user_community = UserCommunity(user_id=user_id,community_id=community_id)
+    user_community = UserCommunity(user_id=user_id,community_id=community_id,is_preferred_gym=False)
     db.add(user_community)
     db.commit()
     db.refresh(user_community)
@@ -41,7 +41,7 @@ def get_community_users(db:Session,community_id:int):
 
 def set_preferred_community_by_id(db:Session,community_id:int,user_id:int):
     user_community = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.community_id==community_id)).first()
-    curr_preferred_gym = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.community_id==community_id,UserCommunity.is_preferred_gym==True)).first()
+    curr_preferred_gym = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.is_preferred_gym==True)).first()
     if not user_community:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
