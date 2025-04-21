@@ -38,3 +38,23 @@ def get_community_users(db:Session,community_id:int):
     for user_community in users_communities:
         users.append(get_user_info_by_id(db,user_community.user_id))
     return users
+
+def set_preferred_community_by_id(db:Session,community_id:int,user_id:int):
+    user_community = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.community_id==community_id)).first()
+    curr_preferred_gym = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.community_id==community_id,UserCommunity.is_preferred_gym==True)).first()
+    if not user_community:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="connection DNE"
+        )
+    if not curr_preferred_gym:
+        user_community.is_preferred_gym = True
+    else:
+        curr_preferred_gym.is_preferred_gym = False
+        user_community.is_preferred_gym= True
+    db.commit()
+    if(curr_preferred_gym):
+        db.refresh(curr_preferred_gym)
+    db.refresh(user_community)
+    return user_community
+    

@@ -26,3 +26,7 @@ def leave_community(community_id,db:Session = Depends(get_db),current_user: User
 @router.get("/{community_id}")
 def get_community_members(community_id,db:Session = Depends(get_db)):
     return get_community_users(db=db, community_id=community_id)
+
+@router.patch("/{community_id}/prefer")
+def set_preferred_community(community_id:int, db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    return set_preferred_community_by_id(db,community_id,current_user.id)
