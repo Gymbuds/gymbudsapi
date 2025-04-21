@@ -5,6 +5,6 @@ class CommunityCreate(BaseModel):
     address: str
     latitude : float
     longitude : float
-    
+    places_id :str
 
 

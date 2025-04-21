@@ -2,6 +2,7 @@ from app.db.database import Base
 from sqlalchemy import Column,Integer,String,Float
 from sqlalchemy.orm import relationship
 
+
 class Community(Base):
     __tablename__ = "gym_communities"
     id = Column(Integer,primary_key=True)
@@ -12,3 +13,7 @@ class Community(Base):
 
 
     community_posts = relationship("CommunityPost", back_populates="gym_community", cascade="all, delete-orphan")
+    places_id = Column(String,nullable=True)
+
+    
+    user_communities_link = relationship("UserCommunity", back_populates="community", cascade="all, delete-orphan")
