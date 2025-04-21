@@ -3,7 +3,7 @@ from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.schemas.community import CommunityCreate
 from app.db.models.user import User
-from app.db.crud.community_crud import get_community_by_address,create_community,user_join_community,user_leave_community,get_community_users
+from app.db.crud.community_crud import get_community_by_address,create_community,user_join_community,user_leave_community,get_community_users,get_user_preferred_gym,set_preferred_community_by_id
 from app.core.security import get_current_user
 
 router = APIRouter()
@@ -29,4 +29,8 @@ def get_community_members(community_id,db:Session = Depends(get_db)):
 
 @router.patch("/{community_id}/prefer")
 def set_preferred_community(community_id:int, db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    return set_preferred_community_by_id(db,community_id,current_user.id)
+
+@router.get("/{community_id}/prefer")
+def get_preferred_community(db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     return set_preferred_community_by_id(db,community_id,current_user.id)
