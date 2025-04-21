@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.db.models.community import Community
 from app.db.models.user_community import UserCommunity
+from app.db.crud.user_crud import get_user_info_by_id
 from sqlalchemy import and_
 from fastapi import HTTPException, status
  
@@ -32,5 +33,8 @@ def user_leave_community(db:Session,community_id:int,user_id:int):
     db.commit()
 
 def get_community_users(db:Session,community_id:int):
-    users = db.query(UserCommunity).filter(UserCommunity.community_id==community_id).all()
+    users_communities = db.query(UserCommunity).filter(UserCommunity.community_id==community_id).all()
+    users = []
+    for user_community in users_communities:
+        users.append(get_user_info_by_id(db,user_community.user_id))
     return users
