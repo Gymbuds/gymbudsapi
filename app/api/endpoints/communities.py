@@ -31,6 +31,3 @@ def get_community_members(community_id,db:Session = Depends(get_db)):
 def set_preferred_community(community_id:int, db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     return set_preferred_community_by_id(db,community_id,current_user.id)
 
-@router.get("/{community_id}/prefer")
-def get_preferred_community(db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
-    return get_user_preferred_gym(db,current_user.id)
