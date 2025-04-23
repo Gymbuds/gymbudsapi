@@ -100,6 +100,7 @@ def update_profile(
         age=user_update.age,
         skill_level=user_update.skill_level,
         weight=user_update.weight,
+        gender = user_update.gender,
         user = current_user
     )
     

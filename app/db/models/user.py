@@ -7,6 +7,9 @@ class SkillLevel(enum.Enum):
     BEGINNER = "BEGINNER"
     INTERMEDIATE = "INTERMEDIATE"
     ADVANCED = "ADVANCED"
+class Gender(enum.Enum):
+    MALE = "MALE"
+    FEMALE = "FEMALE"
 class User(Base):
     __tablename__ = "users"
 
@@ -23,6 +26,7 @@ class User(Base):
     age = Column(Integer,nullable=True)
     skill_level = Column(Enum(SkillLevel), nullable=True)
     weight = Column(Integer,nullable=True)
+    gender = Column(Enum(Gender),nullable=True)
 
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
