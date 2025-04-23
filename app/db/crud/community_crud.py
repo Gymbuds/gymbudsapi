@@ -21,7 +21,7 @@ def user_join_community(db:Session,community_id:int,user_id:int):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User is already a member of this community."
         )
-    user_community = UserCommunity(user_id=user_id,community_id=community_id)
+    user_community = UserCommunity(user_id=user_id,community_id=community_id,is_preferred_gym=False)
     db.add(user_community)
     db.commit()
     db.refresh(user_community)
@@ -38,3 +38,29 @@ def get_community_users(db:Session,community_id:int):
     for user_community in users_communities:
         users.append(get_user_info_by_id(db,user_community.user_id))
     return users
+
+def set_preferred_community_by_id(db:Session,community_id:int,user_id:int):
+    user_community = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.community_id==community_id)).first()
+    curr_preferred_gym = db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.is_preferred_gym==True)).first()
+    if not user_community:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="connection DNE"
+        )
+    if not curr_preferred_gym:
+        user_community.is_preferred_gym = True
+    else:
+        curr_preferred_gym.is_preferred_gym = False
+        user_community.is_preferred_gym= True
+    db.commit()
+    if(curr_preferred_gym):
+        db.refresh(curr_preferred_gym)
+    db.refresh(user_community)
+    return user_community
+    
+def get_user_preferred_gym(db:Session,user_id:int):
+    user_community =  db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.is_preferred_gym==True)).first() 
+
+    pref_gym = db.query(Community).filter(Community.id==user_community.community_id).first()
+
+    return pref_gym
