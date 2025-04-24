@@ -38,3 +38,16 @@ class User(Base):
     community_posts = relationship("CommunityPost", back_populates="user", cascade="all, delete-orphan")
     post_likes = relationship("PostLike", back_populates="user", cascade="all, delete-orphan")
     post_comments = relationship("PostComment", back_populates="user", cascade="all, delete-orphan")
+
+    match_results1 = relationship(
+        "MatchResult",
+        back_populates="user1",
+        foreign_keys="[MatchResult.user_id1]",
+        cascade="all, delete-orphan"
+    )
+    match_results2 = relationship(
+        "MatchResult",
+        back_populates="user2",
+        foreign_keys="[MatchResult.user_id2]",
+        cascade="all, delete-orphan"
+    )

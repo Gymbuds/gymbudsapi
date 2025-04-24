@@ -25,7 +25,7 @@ def update_community_post(
 ):
     return update_post(db, current_user.id, post_id, post_update)
 
-@router.delete("/{post_id}", status_code=201)
+@router.delete("/{post_id}")
 def delete_community_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     delete_post(db, current_user.id, post_id)
     return {"success": "Post deleted"}
