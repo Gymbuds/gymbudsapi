@@ -32,3 +32,4 @@ class UserUpdate(BaseModel):
     age: int | None = None 
     skill_level: str | None = None 
     weight: int | None = None
+    gender: str | None = None
