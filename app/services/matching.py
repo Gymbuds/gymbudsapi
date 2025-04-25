@@ -25,7 +25,9 @@ def match_users(db:Session,user_id:int):
             user_aval_ranges.append(day_ranges)
     for i in range(len(user_aval_ranges)): # sort each day avalranges for comparison later
         user_aval_ranges[i] = sorted(user_aval_ranges[i],key=lambda aval_range: aval_range.start_time)
-    
+    potential_similar_schedule_users = set()
+    for day in user_aval_days: # get all unique user_ids 
+        db.query(AvailabilityRange.user_id).filter(and_(AvailabilityRange.user_id!=user_id,AvailabilityRange.day_of_week==day))
 
 
         
