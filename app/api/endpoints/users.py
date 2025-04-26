@@ -123,7 +123,7 @@ def generate_upload_url(
     )
     return {
         "upload_url": presigned_url,  # Used by frontend to PUT the image
-        "file_url": s3_file_url   # Final S3 URL (to send later to PATCH)
+        "file_url": s3_file_url       # Final S3 URL to save into DB
     }
 
 @router.get("/prefer")
