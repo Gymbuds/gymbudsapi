@@ -17,7 +17,7 @@ s3_client = boto3.client(
     region_name=AWS_REGION,
 )
 
-def create_presigned_upload_url(user_id: int, file_extension: str, folder: str, expiration: int = 3600):
+def create_presigned_upload_url(user_id: int, file_extension: str, folder: str = "profile_pictures", expiration: int = 3600):
     key = f"{folder}/user_{user_id}_{uuid4()}.{file_extension}"
 
     try:
