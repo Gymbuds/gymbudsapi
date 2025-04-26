@@ -5,7 +5,7 @@ from app.db.crud.user_crud import create_user,update_user
 from sqlalchemy.orm import Session
 from app.core.security import get_current_user, hash_password, validate_password
 from app.core.security import hash_password, get_current_user, validate_password, create_access_token, create_refresh_token
-
+from app.core.s3 import create_presigned_upload_url
 from app.db.models.user import User
 from app.db.session import get_db
 from app.schemas.user import UserCreate,UserUpdate
@@ -87,11 +87,12 @@ def update_profile(
     """
     Update user profile information.
     """
-    if not any([user_update.name, user_update.profile_picture, user_update.preferred_workout_goals, user_update.age, user_update.skill_level,user_update.weight]):
+    if not any([user_update.name, user_update.profile_picture, user_update.preferred_workout_goals, user_update.age, user_update.skill_level, user_update.weight, user_update.gender]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="At least one field must be provided for update."
         )
+
     update_user(
         db=db,
         name=user_update.name,
@@ -100,12 +101,31 @@ def update_profile(
         age=user_update.age,
         skill_level=user_update.skill_level,
         weight=user_update.weight,
-        gender = user_update.gender,
-        user = current_user
+        gender=user_update.gender,
+        user=current_user
     )
-    
-    
+
     return {"success": "User profile updated successfully", "user": current_user}
+
+@router.get("/profile/generate-upload-url/")
+def generate_upload_url(
+    file_extension: str,  # example: "jpeg", "png"
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if file_extension not in ["jpeg", "jpg", "png"]:
+        raise HTTPException(status_code=400, detail="Invalid file extension")
+
+    presigned_url, s3_file_url = create_presigned_upload_url(
+        user_id=current_user.id,
+        file_extension=file_extension,
+        folder="profile_pictures"
+    )
+    return {
+        "upload_url": presigned_url,  # Used by frontend to PUT the image
+        "file_url": s3_file_url   # Final S3 URL (to send later to PATCH)
+    }
+
 @router.get("/prefer")
 def get_preferred_community(db:Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     return get_user_preferred_gym(db,current_user.id)
