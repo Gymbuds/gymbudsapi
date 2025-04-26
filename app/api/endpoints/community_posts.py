@@ -32,7 +32,7 @@ def generate_community_post_upload_url(
     db: Session = Depends(get_db), 
     current_user: User = Depends(get_current_user)
 ):
-    if file_extension not in ["jpeg", "jpg", "png"]:
+    if file_extension not in ["jpeg", "jpg", "png", "mp4", "mov"]:
         raise HTTPException(status_code=400, detail="Invalid file extension")
 
     presigned_url, s3_file_url = create_presigned_upload_url(
