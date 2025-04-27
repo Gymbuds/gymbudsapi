@@ -4,7 +4,7 @@ from app.db.models.user import User
 from app.db.crud.range_crud import create_avail_range,get_availability_ranges_user,delete_aval_range
 from app.core.security import get_current_user
 from app.db.session import get_db
-from app.services.matching import match_users
+from app.services.matching import get_similar_schedules_for_user
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -64,4 +64,4 @@ async def delete_availability_range(aval_range: AvalRangeDelete= Body(...), curr
 
 @router.post("/test")
 def test_match(db:Session = Depends(get_db),current_user :User = Depends(get_current_user)):
-    return match_users(db=db,user_id= current_user.id)
+    return get_similar_schedules_for_user(db=db,user_id= current_user.id)
