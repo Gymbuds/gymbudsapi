@@ -27,4 +27,12 @@ def update_user(db:Session, name:str, profile_picture:str, preferred_workout_goa
 def get_user_info_by_id(db:Session,user_id:int):
     user = db.query(User).filter(User.id==user_id).first()
     return user
+
+
+def get_multiple_users_info_by_ids(db: Session, user_ids: list[int]):
+    if not user_ids:
+        return []
+
+    users = db.query(User).filter(User.id.in_(user_ids)).all()
+    return users
   
