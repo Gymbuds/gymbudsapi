@@ -2,7 +2,10 @@
 from sqlalchemy.orm import Session
 from app.db.crud.range_crud import get_availability_ranges_user
 from app.db.models.avalrange import AvailabilityRange,DayOfWeek
+from app.db.models.user import User
+from app.db.crud.user_crud import get_user_info_by_id
 from sqlalchemy import and_
+
 import json
 def get_similar_schedules_for_user(db:Session,user_id:int):
     # match schedules
@@ -54,5 +57,21 @@ def get_similar_schedules_for_user(db:Session,user_id:int):
         
         
     return potential_similar_schedule_users
-def match_users(db:Session,user_id:int):
-    valid_users = get_similar_schedules_for_user(db=db,user_id=user_id) # set of user_ids of eligible users
+def match_users(db:Session,user:User):
+    valid_user_ids = get_similar_schedules_for_user(db=db,user_id=user.id) # set of user_ids of eligible users
+    scores_user_id = {}
+    scores = []
+    for user_id in valid_user_ids: # 
+        potential_user_info = get_user_info_by_id(db=db,user_id=user_id) 
+        score = 0
+         # point system more points = better fit 
+        if(not potential_user_info):
+            pass
+        if(user.skill_level and potential_user_info.skill_level and user.skill_level == potential_user_info.skill_level):
+           score+=5
+        
+        scores.append(score)
+        scores_user_id[score] = user_id
+        
+    return {"Hello":"World"}
+
