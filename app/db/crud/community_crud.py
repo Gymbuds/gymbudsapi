@@ -13,6 +13,8 @@ def create_community(db:Session,name:str,address:str,latitude:float,longitude:fl
     return community
 def get_community_by_address(db:Session,address:str):
     return db.query(Community).filter(Community.address == address).first()
+def get_community_by_id(db:Session,community_id:str):
+    return db.query(Community).filter(Community.id == community_id).first()
 
 def user_join_community(db:Session,community_id:int,user_id:int):
     existing = db.query(UserCommunity).filter_by(user_id=user_id, community_id=community_id).first()
@@ -64,3 +66,7 @@ def get_user_preferred_gym(db:Session,user_id:int):
     pref_gym = db.query(Community).filter(Community.id==user_community.community_id).first()
 
     return pref_gym
+
+def get_user_gyms(db:Session,user_id:int):
+    list_community = db.query(UserCommunity).filter(UserCommunity.user_id==user_id).all() 
+    return list_community
