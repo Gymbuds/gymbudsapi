@@ -21,13 +21,13 @@ class User(Base):
     profile_picture = Column (String,nullable=True)
     latitude = Column(Float,nullable=True)
     longitude = Column (Float,nullable=True)
-    preferred_workout_goals = Column(Text,nullable = True)
     created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
     age = Column(Integer,nullable=True)
     skill_level = Column(Enum(SkillLevel), nullable=True)
     weight = Column(Integer,nullable=True)
     gender = Column(Enum(Gender),nullable=True)
-
+    zip_code = Column(String,nullable=True)
+    preferred_workout_goals =Column(List[Enum(GymGoal)],nullable=True)  
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")
@@ -51,3 +51,5 @@ class User(Base):
         foreign_keys="[MatchResult.user_id2]",
         cascade="all, delete-orphan"
     )
+    match_preferences = relationship("MatchPreference",back_populates="user", cascade="all, delete-orphan")
+    goals = relationship("UserGoal", back_populates="user", cascade="all, delete-orphan")

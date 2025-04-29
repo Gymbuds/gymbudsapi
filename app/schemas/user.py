@@ -1,5 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from app.db.models.user import SkillLevel
+from typing import List
+from app.db.models.user_goal import GymGoal
 # Schema for user registration
 class UserCreate(BaseModel):
     name: str
@@ -33,3 +35,7 @@ class UserUpdate(BaseModel):
     skill_level: str | None = None 
     weight: int | None = None
     gender: str | None = None
+
+
+class UserGoalsUpdate(BaseModel):
+    goals: List[GymGoal]
