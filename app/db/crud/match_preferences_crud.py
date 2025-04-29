@@ -1,12 +1,16 @@
 from sqlalchemy.orm import Session
-from app.db.models.match_preferences import MatchPreference,GenderPref
+from app.db.models.match_preferences import MatchPreference
+from app.schemas.match import GenderPref
 from app.db.crud.user_crud import get_user_info_by_id
-from fastapi import HTTPException
+from fastapi import HTTPException,status
 
 def create_match_preference(db:Session,user_id:int):
     user = get_user_info_by_id(db=db,user_id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    pot_match_pref = db.query(MatchPreference).filter(MatchPreference.user_id==user_id).first()
+    if pot_match_pref is not None:
+         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User Match Pref exists already")
     match_pref = MatchPreference(
         user_id=user_id,
         gender=GenderPref.BOTH,
@@ -32,6 +36,7 @@ def update_match_preference(db:Session,user_id:int,gender:GenderPref | None, sta
         match_pref.max_location_distance_miles = max_location_distance_miles
     db.commit()
     db.refresh(match_pref)
+    return match_pref
 def get_match_preference(db:Session,user_id:int):
     match_pref = db.query(MatchPreference).filter(MatchPreference.user_id==user_id).first()
     return match_pref

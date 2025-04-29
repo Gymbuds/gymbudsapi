@@ -26,7 +26,7 @@ def upgrade() -> None:
                     sa.Column('gender',sa.Enum('MALE', 'FEMALE', 'BOTH',name='gender'), nullable=False),
                     sa.Column('start_weight',sa.Integer(),nullable = False),
                     sa.Column('end_weight',sa.Integer(),nullable=False),
-                    sa.Column('max_location_distance_miles',nullable=False),
+                    sa.Column('max_location_distance_miles',sa.Integer(),nullable=False),
                     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'))
 
 
