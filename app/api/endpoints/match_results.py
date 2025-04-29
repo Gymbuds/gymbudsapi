@@ -6,6 +6,7 @@ from app.db.crud.match_crud import create_match,delete_match,get_matches
 from app.db.crud.user_crud import get_user_info_by_id
 from app.db.crud.range_crud import get_availability_ranges_user
 from app.db.crud.community_crud import get_user_preferred_gym
+from app.db.crud.user_goals_crud import get_user_goals
 from app.core.security import get_current_user
 from app.db.models.user import User
 from app.services.matching import match_users
@@ -40,3 +41,7 @@ def get_user_aval_ranges_for_match(user_id:int,db:Session = Depends(get_db)):
 @router.get("/prefer/{user_id}")
 def get_user_pref_for_match(user_id:int,db:Session = Depends(get_db)):
     return get_user_preferred_gym(db=db,user_id=user_id)
+
+@router.get("/user-goal-info/{user_id}")
+def get_user_goals_for_match(user_id:int,db:Session = Depends(get_db)):
+    return get_user_goals(db=db, user_id=user_id)
