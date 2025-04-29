@@ -27,7 +27,6 @@ class User(Base):
     weight = Column(Integer,nullable=True)
     gender = Column(Enum(Gender),nullable=True)
     zip_code = Column(String,nullable=True)
-    preferred_workout_goals =Column(List[Enum(GymGoal)],nullable=True)  
     
     availability_ranges = relationship("AvailabilityRange", back_populates="user", cascade="all, delete-orphan") # if one user is deleted so are all of their ranges
     workout_logs = relationship("WorkoutLog", back_populates="user", cascade="all, delete-orphan")

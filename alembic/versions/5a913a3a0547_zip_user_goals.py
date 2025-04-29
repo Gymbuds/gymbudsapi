@@ -20,8 +20,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # need to add column for remove
-    op.add_column("users","zip_code",sa.Column(sa.String(),nullable=True))
+    op.drop_column("users","preferred_workout_goals")
+    op.add_column("users", sa.Column("zip_code", sa.String(), nullable=True))
     op.create_table(
         'user_goals',
         sa.Column('id', sa.Integer(), primary_key=True, index=True),
@@ -32,4 +32,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    pass
+    op.add_column('users', sa.Column('preferred_workout_goals', sa.Text(), nullable=True))
+    op.drop_column('users','zip_code')
+    op.drop_table('user_goals')
+    op.execute('DROP TYPE gymgoal')
