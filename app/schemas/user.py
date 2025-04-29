@@ -30,11 +30,11 @@ class AuthToken(BaseModel):
 class UserUpdate(BaseModel):
     name: str | None = None
     profile_picture: str | None = None
-    preferred_workout_goals: str | None = None
     age: int | None = None 
     skill_level: str | None = None 
     weight: int | None = None
     gender: str | None = None
+    zip_code: int | None = None
 
 
 class UserGoalsUpdate(BaseModel):
