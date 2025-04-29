@@ -14,7 +14,7 @@ class GymGoal(enum.Enum):
 
 class UserGoal(Base):
     __tablename__ = "user_goals"
-
+    id = Column(Integer,primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     goal = Column(Enum(GymGoal), nullable=False)
     user = relationship("User", back_populates="goals")
