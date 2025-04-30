@@ -5,7 +5,10 @@ from app.db.models.avalrange import AvailabilityRange, DayOfWeek
 from app.db.models.user import User
 from app.db.crud.user_crud import get_user_info_by_id, get_multiple_users_info_by_ids
 from app.db.crud.community_crud import get_user_preferred_gym, get_multiple_users_preferred_gym_ids
+from app.db.crud.match_preferences_crud import get_match_preference
+from app.db.models.match_preferences import MatchPreference
 from sqlalchemy import and_
+from math import radians,cos,sin,asin,sqrt
 
 import json
 
@@ -63,11 +66,32 @@ def get_similar_schedules_for_user(db: Session, user_id: int):
 
     return potential_similar_schedule_users
 
+def distance_between_two_points(lat1:float,lat2:float,long1:float,long2:float): # Haversine formula
+    R = 6371 
+    delta_lat = radians(lat2 - lat1)
+    delta_lon = radians(long2 - long1)
+    a = sin(delta_lat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(delta_lon/2)**2
+    c = 2 * asin(sqrt(a))
+    return R*c * 0.621371 # kms -> miles
+def compare_user_ids_distance(db:Session,user_id:int,user_ids:set,user_match_pref: MatchPreference):
+    users_info = get_multiple_users_info_by_ids(db=db, user_ids=user_ids)
+    main_user_info = get_user_info_by_id(db=db,user_id=user_id)
+    res = set ()
+    for user in users_info: 
+        distance_miles = distance_between_two_points(main_user_info.latitude,user.latitude,main_user_info.longitude,user.longitude)
+        if distance_miles<= user_match_pref.max_location_distance_miles:
+            res.add(user.id)
+    return res
+
 def match_users(db: Session, user: User):
-    valid_user_ids = get_similar_schedules_for_user(db=db, user_id=user.id)  # set of user_ids of eligible users
+    intial_schedule_check = get_similar_schedules_for_user(db=db, user_id=user.id)  # set of user_ids of eligible users
+    # distance_checked_user_ids = 
+    user_match_preferences = get_match_preference(db=db,user_id=user.id)
+    distance_checked_user_ids =  compare_user_ids_distance(db=db,user_id=user.id,user_ids=intial_schedule_check,user_match_pref=user_match_preferences)
+    
     scores_user_id = {}  # score -> list of user ids
 
-    if not valid_user_ids:
+    if not intial_schedule_check:
         return []
 
     # point system more points = better fit 
@@ -76,7 +100,7 @@ def match_users(db: Session, user: User):
     user_pref_gym = get_user_preferred_gym(db=db, user_id=user.id)
 
     # batch fetch potential users' info and preferred gyms
-    user_ids = list(valid_user_ids) # prevents different user_ids 
+    user_ids = list(intial_schedule_check) # prevents different user_ids 
     potential_users_info = get_multiple_users_info_by_ids(db=db, user_ids=user_ids)
     potential_users_gym = get_multiple_users_preferred_gym_ids(db=db, user_ids=user_ids)
 
@@ -84,6 +108,7 @@ def match_users(db: Session, user: User):
         "skill": 5,
         "gender": 2,
         "weight": 8,
+        "goal": 2,
         "gym": 20,
     }
 
