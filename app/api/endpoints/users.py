@@ -87,7 +87,7 @@ def update_profile(
     """
     Update user profile information.
     """
-    if not any([user_update.name, user_update.profile_picture, user_update.age, user_update.skill_level, user_update.weight, user_update.gender, user_update.zip_code]):
+    if not any([user_update.name, user_update.profile_picture, user_update.age, user_update.skill_level, user_update.weight, user_update.gender, user_update.zip_code, user_update.latitude, user_update.longitude]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="At least one field must be provided for update."
@@ -102,6 +102,8 @@ def update_profile(
         weight=user_update.weight,
         gender=user_update.gender,
         zip_code=user_update.zip_code,
+        longitude=user_update.longitude,
+        latitude=user_update.latitude,
         user=current_user
     )
 

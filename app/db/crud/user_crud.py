@@ -7,7 +7,7 @@ def create_user(db: Session, email: str, password: str, name: str) -> User:
     db.commit()
     db.refresh(db_user)
     return db_user
-def update_user(db:Session, name:str, profile_picture:str, age:int, skill_level:str,weight:int,gender:str,zip_code:int,user:User):
+def update_user(db:Session, name:str, profile_picture:str, age:int, skill_level:str,weight:int,gender:str,zip_code:int,longitude:float,latitude:float,user:User):
     if name:
         user.name = name
     if profile_picture:
@@ -22,6 +22,10 @@ def update_user(db:Session, name:str, profile_picture:str, age:int, skill_level:
         user.gender = gender
     if zip_code:
         user.zip_code = zip_code
+    if longitude:
+        user.longitude=longitude
+    if latitude:
+        user.latitude=latitude
     db.commit()
     db.refresh(user)  
 def get_user_info_by_id(db:Session,user_id:int):

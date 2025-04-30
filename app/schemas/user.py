@@ -35,6 +35,8 @@ class UserUpdate(BaseModel):
     weight: int | None = None
     gender: str | None = None
     zip_code: int | None = None
+    longitude: float | None = None
+    latitude: float | None = None
 
 
 class UserGoalsUpdate(BaseModel):
