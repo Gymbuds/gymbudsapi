@@ -6,6 +6,7 @@ from app.db.models.user import User
 from app.db.crud.user_crud import get_user_info_by_id, get_multiple_users_info_by_ids
 from app.db.crud.community_crud import get_user_preferred_gym, get_multiple_users_preferred_gym_ids
 from app.db.crud.match_preferences_crud import get_match_preference
+from app.db.crud.user_goals_crud import get_list_user_goals_as_set,get_multiple_users_goals_as_set
 from app.db.models.match_preferences import MatchPreference
 from sqlalchemy import and_
 from math import radians,cos,sin,asin,sqrt
@@ -88,9 +89,7 @@ def match_users(db: Session, user: User):
     # distance_checked_user_ids = 
     user_match_preferences = get_match_preference(db=db,user_id=user.id)
     distance_checked_user_ids =  compare_user_ids_distance(db=db,user_id=user.id,user_ids=intial_schedule_check,user_match_pref=user_match_preferences)
-    
     scores_user_id = {}  # score -> list of user ids
-
     if not intial_schedule_check:
         return []
 
@@ -100,15 +99,16 @@ def match_users(db: Session, user: User):
     user_pref_gym = get_user_preferred_gym(db=db, user_id=user.id)
 
     # batch fetch potential users' info and preferred gyms
-    user_ids = list(intial_schedule_check) # prevents different user_ids 
+    user_ids = list(distance_checked_user_ids) # prevents different user_ids 
     potential_users_info = get_multiple_users_info_by_ids(db=db, user_ids=user_ids)
     potential_users_gym = get_multiple_users_preferred_gym_ids(db=db, user_ids=user_ids)
-
+    potential_users_goals= get_multiple_users_goals_as_set(db=db,user_ids=user_ids)
+    user_goals = get_list_user_goals_as_set(db=db,user_id=user.id)
     WEIGHTS = {
         "skill": 5,
         "gender": 2,
         "weight": 8,
-        "goal": 2,
+        "goal": 4,
         "gym": 20,
     }
 
@@ -118,24 +118,27 @@ def match_users(db: Session, user: User):
 
         if not potential_user:
             continue  # if user info is missing, skip
-
+        
         # skill level matching
         if user.skill_level and potential_user.skill_level and user.skill_level == potential_user.skill_level:
             score += WEIGHTS["skill"]
 
         # gender matching
-        if user.gender and potential_user.gender and user.gender == potential_user.gender:
+        if user.gender and potential_user.gender and (user_match_preferences.gender == potential_user.gender or user_match_preferences.gender == "BOTH"):
             score += WEIGHTS["gender"]
 
-        # weight proximity  needs to be within 50 ppounds
-        if user.weight and potential_user.weight and abs(potential_user.weight - user.weight) <= 50:
+        # weight proximity  needs to be within user pref  ppounds
+        if user.weight and potential_user.weight and potential_user.weight <= user_match_preferences.end_weight and potential_user.weight >= user_match_preferences.start_weight:
             score += WEIGHTS["weight"]
-
+        
         # Preferred gym matching
-        user_pref_gym
-        if user_pref_gym.id and potential_users_gym[potential_user_id] and user_pref_gym.id == potential_users_gym[potential_user_id]:
+        if user_pref_gym.id and potential_user_id in potential_users_gym and user_pref_gym.id == potential_users_gym[potential_user_id]:
             score += WEIGHTS["gym"]
 
+        # print(user_goals.intersection(potential_users_goals[potential_user_id]))
+        if user_goals and potential_user_id in potential_users_goals:
+            score+= WEIGHTS["goal"] * len(user_goals.intersection(potential_users_goals[potential_user_id]))
+        print(score)
         if score not in scores_user_id:
             scores_user_id[score] = []
         scores_user_id[score].append(potential_user_id)
