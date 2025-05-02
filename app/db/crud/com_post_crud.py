@@ -51,7 +51,7 @@ def delete_post(db: Session, user_id: int, post_id: int) -> None:
     db.delete(post)
     db.commit()
 
-def get_posts_by_community(db: Session, community_id: int):
+def get_posts_by_community(db: Session, community_id: int, user_id: int):
     community = db.query(Community).filter(Community.id == community_id).first()
     if not community:
         raise HTTPException(status_code=404, detail="Community not found")
@@ -65,6 +65,7 @@ def get_posts_by_community(db: Session, community_id: int):
     for post in posts:
         post.like_count = len(post.post_likes)
         post.comments = post.post_comments
+        post.is_liked_by_current_user = any(like.user_id == user_id for like in post.post_likes) 
 
     return posts
 

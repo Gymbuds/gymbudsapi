@@ -97,5 +97,5 @@ def delete_comment(
     return {"success": "Comment deleted"}
 
 @router.get("/community/{community_id}", response_model=List[CommunityPostResponse])
-def list_posts_for_community(community_id: int, db: Session = Depends(get_db)):
-    return get_posts_by_community(db, community_id)
+def list_posts_for_community(community_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return get_posts_by_community(db, community_id, current_user.id)

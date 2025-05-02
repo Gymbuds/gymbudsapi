@@ -28,3 +28,4 @@ class CommunityPostResponse(CommunityPostCreate):
     created_at: datetime
     like_count: Optional[int] = 0
     comments: Optional[List[PostCommentResponse]] = []
+    is_liked_by_current_user: Optional[bool] = False
