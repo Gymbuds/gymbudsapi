@@ -10,6 +10,7 @@ from app.db.models.user import User
 from app.db.session import get_db
 from app.schemas.user import UserCreate,UserUpdate
 from app.db.crud.community_crud import get_user_preferred_gym,get_user_gyms,get_community_by_id
+from app.db.crud.match_preferences_crud import create_match_preference
 
 router = APIRouter()
 
@@ -61,6 +62,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Store the hashed refresh token in DB
     new_user.hashed_refresh_token = hash_password(refresh_token)
     db.commit()
+
+    create_match_preference(db, new_user.id)
     
     return {"success": "User created successfully", "access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 

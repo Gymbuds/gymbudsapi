@@ -13,16 +13,16 @@ from app.schemas.match import MatchPreferenceUpdate
 router = APIRouter()
 
 # Create match preference
-@router.post("")
-def create_match_pref(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    create match preference for the current user.
-    to be called when user account is first created.
-    """
-    return create_match_preference(db=db, user_id=current_user.id)
+# @router.post("")
+# def create_match_pref(
+#     db: Session = Depends(get_db),
+#     current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     create match preference for the current user.
+#     to be called when user account is first created.
+#     """
+#     return create_match_preference(db=db, user_id=current_user.id)
 
 # Get match preference
 @router.get("")
