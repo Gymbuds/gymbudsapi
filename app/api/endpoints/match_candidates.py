@@ -12,15 +12,15 @@ router = APIRouter()
 
 
 
-@router.post("/", response_model=dict)
-def create_match_candidate(data: CandidateCreate, db: Session = Depends(get_db)):
-    create_candidate(
-        db,
-        user_id=data.user_id,
-        candidate_user_id=data.candidate_user_id,
-        score=data.score,
-    )
-    return {"message": "Candidate created"}
+# @router.post("/", response_model=dict)
+# def create_match_candidate(data: CandidateCreate, db: Session = Depends(get_db)):
+#     create_candidate(
+#         db,
+#         user_id=data.user_id,
+#         candidate_user_id=data.candidate_user_id,
+#         score=data.score,
+#     )
+#     return {"message": "Candidate created"}
 
 @router.get("")
 def get_candidates(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
