@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.db.session import check_db_connection  # Import the check_db_connection function
-from app.api.endpoints import users, auth, availabilityranges, workout_logs, ai_advices, health_datas,communities,community_posts,match_results,match_prefs,user_goals
+from app.api.endpoints import match_candidates, users, auth, availabilityranges, workout_logs, ai_advices, health_datas,communities,community_posts,match_results,match_prefs,user_goals
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -20,6 +20,7 @@ app.include_router(communities.router,prefix="/communities",tags=["communities"]
 app.include_router(community_posts.router,prefix="/community_posts",tags=["community_posts"])
 app.include_router(match_results.router,prefix="/match",tags=["match_results"])
 app.include_router(match_prefs.router,prefix="/match_pref",tags=['match_prefs'])
+app.include_router(match_candidates.router,prefix="/match_cands",tags=['match_cands'])
 # CORS Middleware Configuration
 origins = [
     "http://localhost.tiangolo.com",
