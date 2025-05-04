@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.db.models.match_candidate import MatchCandidate
+from app.db.models.user import User
 from app.schemas.match import CandidateCreate,StatusUpdate
 from app.db.crud.candidate_crud import create_candidate,get_all_candidates,update_candidate_status
-from pydantic import BaseModel
+from app.core.security import get_current_user
 from typing import List
 
 router = APIRouter()
@@ -21,9 +22,9 @@ def create_match_candidate(data: CandidateCreate, db: Session = Depends(get_db))
     )
     return {"message": "Candidate created"}
 
-@router.get("/{user_id}", response_model=List[MatchCandidate])
-def get_candidates(user_id: int, db: Session = Depends(get_db)):
-    return get_all_candidates(db, user_id)
+@router.get("")
+def get_candidates(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    return get_all_candidates(db=db, user_id=current_user.id)
 
 @router.put("/status", response_model=dict)
 def update_match_status(data: StatusUpdate, db: Session = Depends(get_db)):

@@ -7,6 +7,7 @@ from app.db.crud.user_crud import get_user_info_by_id, get_multiple_users_info_b
 from app.db.crud.community_crud import get_user_preferred_gym, get_multiple_users_preferred_gym_ids
 from app.db.crud.match_preferences_crud import get_match_preference
 from app.db.crud.user_goals_crud import get_list_user_goals_as_set,get_multiple_users_goals_as_set
+from app.db.crud.candidate_crud import create_candidate
 from app.db.models.match_preferences import MatchPreference
 from sqlalchemy import and_
 from math import radians,cos,sin,asin,sqrt
@@ -89,7 +90,7 @@ def match_users(db: Session, user: User):
     # distance_checked_user_ids = 
     user_match_preferences = get_match_preference(db=db,user_id=user.id)
     distance_checked_user_ids =  compare_user_ids_distance(db=db,user_id=user.id,user_ids=intial_schedule_check,user_match_pref=user_match_preferences)
-    scores_user_id = {}  # score -> list of user ids
+    user_score_id = {}  #  user id ->
     if not intial_schedule_check:
         return []
 
@@ -138,17 +139,8 @@ def match_users(db: Session, user: User):
         # print(user_goals.intersection(potential_users_goals[potential_user_id]))
         if user_goals and potential_user_id in potential_users_goals:
             score+= WEIGHTS["goal"] * len(user_goals.intersection(potential_users_goals[potential_user_id]))
-        print(score)
-        if score not in scores_user_id:
-            scores_user_id[score] = []
-        scores_user_id[score].append(potential_user_id)
-
-    # sort scores in descending order
-    sorted_scores = sorted(scores_user_id.keys(), reverse=True)
-
-    user_sorted_scores = []  # list of (user_id, score)
-    for score in sorted_scores:
-        for uid in scores_user_id[score]:
-            user_sorted_scores.append((uid, score))
-
-    return user_sorted_scores
+        if potential_user_id not in user_score_id:
+            user_score_id[potential_user_id] = score
+    
+    create_candidate(db=db,user_id=user.id,candidate_scores=user_score_id)
+    return user_score_id

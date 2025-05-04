@@ -50,8 +50,8 @@ class User(Base):
         foreign_keys="[MatchResult.user_id2]",
         cascade="all, delete-orphan"
     )
-    candidates = relationship("Candidate", foreign_keys="[MatchCandidate.user_id]", back_populates="user")
-    is_candidate_of = relationship("Candidate", foreign_keys="[MatchCandidate.candidate_id]", back_populates="candidate")
+    candidates = relationship("MatchCandidate", foreign_keys="[MatchCandidate.user_id]", back_populates="user")
+    is_candidate_of = relationship("MatchCandidate", foreign_keys="[MatchCandidate.candidate_user_id]", back_populates="candidate_user")
 
     match_preferences = relationship("MatchPreference",back_populates="user", cascade="all, delete-orphan")
     goals = relationship("UserGoal", back_populates="user", cascade="all, delete-orphan")

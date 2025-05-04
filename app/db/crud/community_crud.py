@@ -74,13 +74,13 @@ def get_user_gyms(db:Session,user_id:int):
 
 def get_multiple_users_preferred_gym_ids(db:Session,user_ids:list[int]): # returns a map user:pref gymid
     if not user_ids:
-        return []
+        return {}
     user_communities = db.query(UserCommunity).filter(
         and_(
             UserCommunity.user_id.in_(user_ids),
             UserCommunity.is_preferred_gym == True
         )
-    )
+    ).all()
     if not user_communities:
         return {}
     user_to_community_id = {uc.user_id: uc.community_id for uc in user_communities}

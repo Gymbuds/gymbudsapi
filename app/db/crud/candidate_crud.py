@@ -1,11 +1,33 @@
 from sqlalchemy.orm import Session
 from app.db.models.match_candidate import MatchCandidate, Status
+from app.db.crud.match_crud import create_match
 from sqlalchemy import and_
-def create_candidate(db:Session,user_id:int,candidate_user_id:int,score:int):
-    new_candidate = MatchCandidate(user_id=user_id,candidate_user_id=candidate_user_id,score=score,status=Status.PENDING)
-    db.add(new_candidate)
+def create_candidate(db: Session, user_id: int, candidate_scores: dict[int, float]):
+    if not candidate_scores:
+        return
+
+    candidate_user_ids = list(candidate_scores.keys())
+
+    existing_candidates = db.query(MatchCandidate).filter(
+        MatchCandidate.user_id == user_id,
+        MatchCandidate.candidate_user_id.in_(candidate_user_ids)
+    ).all()
+
+    existing_map = {mc.candidate_user_id: mc for mc in existing_candidates}
+
+    for candidate_user_id, score in candidate_scores.items():
+        if candidate_user_id in existing_map:
+            existing_map[candidate_user_id].score = score
+        else:
+            new_candidate = MatchCandidate(
+                user_id=user_id,
+                candidate_user_id=candidate_user_id,
+                score=score,
+                status=Status.PENDING
+            )
+            db.add(new_candidate)
+
     db.commit()
-    db.refresh(new_candidate)
 def get_all_candidates(db:Session,user_id:int):
     candidate = db.query(MatchCandidate).filter(MatchCandidate.user_id==user_id).all()
     return candidate
@@ -17,5 +39,8 @@ def update_candidate_status(db:Session,match_candidate_id:int,status:str):
         mutable_status = Status.REJECTED
     elif opposite_candidate and opposite_candidate.status == Status.ACCEPTED and status==Status.ACCEPTED:
         mutable_status = Status.ACCEPTED
-        # call match result crud to make a match
+        create_match(db, match_candidate.user_id, match_candidate.candidate_user_id)
     match_candidate.status = mutable_status
+    db.commit()
+    db.refresh(match_candidate)
+
