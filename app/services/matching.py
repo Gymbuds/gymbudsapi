@@ -107,7 +107,8 @@ def match_users(db: Session, user: User):
     user_goals = get_list_user_goals_as_set(db=db,user_id=user.id)
     WEIGHTS = {
         "skill": 5,
-        "gender": 2,
+        "gender": 3,
+        "age": 3,
         "weight": 8,
         "goal": 4,
         "gym": 20,
@@ -123,7 +124,8 @@ def match_users(db: Session, user: User):
         # skill level matching
         if user.skill_level and potential_user.skill_level and user.skill_level == potential_user.skill_level:
             score += WEIGHTS["skill"]
-
+        if user.age and potential_user.age and (user_match_preferences.start_age<=potential_user.age and user_match_preferences.end_age>=potential_user.age):
+            score+= WEIGHTS["age"]
         # gender matching
         if user.gender and potential_user.gender and (user_match_preferences.gender == potential_user.gender or user_match_preferences.gender == "BOTH"):
             score += WEIGHTS["gender"]
@@ -133,7 +135,7 @@ def match_users(db: Session, user: User):
             score += WEIGHTS["weight"]
         
         # Preferred gym matching
-        if user_pref_gym.id and potential_user_id in potential_users_gym and user_pref_gym.id == potential_users_gym[potential_user_id]:
+        if user_pref_gym and potential_user_id in potential_users_gym and user_pref_gym.id == potential_users_gym[potential_user_id]:
             score += WEIGHTS["gym"]
 
         # print(user_goals.intersection(potential_users_goals[potential_user_id]))
@@ -141,6 +143,7 @@ def match_users(db: Session, user: User):
             score+= WEIGHTS["goal"] * len(user_goals.intersection(potential_users_goals[potential_user_id]))
         if potential_user_id not in user_score_id:
             user_score_id[potential_user_id] = score
+        
     
     create_candidate(db=db,user_id=user.id,candidate_scores=user_score_id)
     return user_score_id

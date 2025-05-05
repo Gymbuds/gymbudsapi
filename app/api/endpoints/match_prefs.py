@@ -50,5 +50,7 @@ def update_match_pref(
         gender=update_data.gender,
         start_weight=update_data.start_weight,
         end_weight=update_data.end_weight,
-        max_location_distance_miles=update_data.max_location_distance_miles
+        max_location_distance_miles=update_data.max_location_distance_miles,
+        start_age=update_data.start_age,
+        end_age =update_data.end_age,
     )

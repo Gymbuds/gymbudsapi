@@ -26,7 +26,8 @@ class MatchPreferenceUpdate(BaseModel):
     start_weight: int | None = None 
     end_weight: int | None = None
     max_location_distance_miles: int | None = None
-
+    start_age: int | None = None 
+    end_age: int | None = None 
 
 class UserUpdate(BaseModel):
     name: str | None = None

@@ -11,5 +11,7 @@ class MatchPreference(Base):
     start_weight = Column(Integer,nullable =False)
     end_weight = Column(Integer,nullable =False)
     max_location_distance_miles = Column(Integer,nullable=False)
+    start_age = Column(Integer,nullable= False)
+    end_age = Column(Integer,nullable= False)
 
     user = relationship("User", back_populates="match_preferences")

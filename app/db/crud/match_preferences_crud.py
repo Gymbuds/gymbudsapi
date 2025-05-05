@@ -16,13 +16,15 @@ def create_match_preference(db:Session,user_id:int):
         gender=GenderPref.BOTH,
         start_weight=0,
         end_weight = 500,
+        start_age = 18,
+        end_age = 100,
         max_location_distance_miles=25,
     )
     db.add(match_pref)
     db.commit()
     db.refresh(match_pref)
 
-def update_match_preference(db:Session,user_id:int,gender:GenderPref | None, start_weight:int  | None,end_weight:int| None,max_location_distance_miles:int| None):
+def update_match_preference(db:Session,user_id:int,gender:GenderPref | None, start_weight:int  | None,end_weight:int| None,max_location_distance_miles:int| None,start_age: int| None,end_age: int| None):
     match_pref = db.query(MatchPreference).filter(MatchPreference.user_id==user_id).first()
     if not match_pref:
         raise HTTPException(status_code=404, detail="Match Preference not found")
@@ -34,6 +36,10 @@ def update_match_preference(db:Session,user_id:int,gender:GenderPref | None, sta
         match_pref.end_weight = end_weight
     if max_location_distance_miles:
         match_pref.max_location_distance_miles = max_location_distance_miles
+    if start_age:
+        match_pref.start_weight = start_weight
+    if end_weight:
+        match_pref.end_weight = end_weight
     db.commit()
     db.refresh(match_pref)
     return match_pref
