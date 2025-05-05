@@ -62,4 +62,6 @@ def downgrade() -> None:
 
     op.drop_index(op.f('ix_workout_logs_id'), table_name='workout_logs')
     op.drop_table('workout_logs')
+    op.execute('DROP TYPE mood_type') 
+    op.execute('DROP TYPE log_method') 
     # ### end Alembic commands ###

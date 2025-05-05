@@ -10,6 +10,7 @@ from app.db.models.user import User
 from app.db.session import get_db
 from app.schemas.user import UserCreate,UserUpdate
 from app.db.crud.community_crud import get_user_preferred_gym,get_user_gyms,get_community_by_id
+from app.db.crud.match_preferences_crud import create_match_preference
 
 router = APIRouter()
 
@@ -61,6 +62,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Store the hashed refresh token in DB
     new_user.hashed_refresh_token = hash_password(refresh_token)
     db.commit()
+
+    create_match_preference(db, new_user.id)
     
     return {"success": "User created successfully", "access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
@@ -87,7 +90,7 @@ def update_profile(
     """
     Update user profile information.
     """
-    if not any([user_update.name, user_update.profile_picture, user_update.preferred_workout_goals, user_update.age, user_update.skill_level, user_update.weight, user_update.gender]):
+    if not any([user_update.name, user_update.profile_picture, user_update.age, user_update.skill_level, user_update.weight, user_update.gender, user_update.zip_code, user_update.latitude, user_update.longitude]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="At least one field must be provided for update."
@@ -97,11 +100,13 @@ def update_profile(
         db=db,
         name=user_update.name,
         profile_picture=user_update.profile_picture,
-        preferred_workout_goals=user_update.preferred_workout_goals,
         age=user_update.age,
         skill_level=user_update.skill_level,
         weight=user_update.weight,
         gender=user_update.gender,
+        zip_code=user_update.zip_code,
+        longitude=user_update.longitude,
+        latitude=user_update.latitude,
         user=current_user
     )
 

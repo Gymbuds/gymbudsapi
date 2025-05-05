@@ -62,7 +62,8 @@ def set_preferred_community_by_id(db:Session,community_id:int,user_id:int):
     
 def get_user_preferred_gym(db:Session,user_id:int):
     user_community =  db.query(UserCommunity).filter(and_(UserCommunity.user_id==user_id,UserCommunity.is_preferred_gym==True)).first() 
-
+    if not user_community:
+        return None
     pref_gym = db.query(Community).filter(Community.id==user_community.community_id).first()
 
     return pref_gym
@@ -70,3 +71,17 @@ def get_user_preferred_gym(db:Session,user_id:int):
 def get_user_gyms(db:Session,user_id:int):
     list_community = db.query(UserCommunity).filter(UserCommunity.user_id==user_id).all() 
     return list_community
+
+def get_multiple_users_preferred_gym_ids(db:Session,user_ids:list[int]): # returns a map user:pref gymid
+    if not user_ids:
+        return {}
+    user_communities = db.query(UserCommunity).filter(
+        and_(
+            UserCommunity.user_id.in_(user_ids),
+            UserCommunity.is_preferred_gym == True
+        )
+    ).all()
+    if not user_communities:
+        return {}
+    user_to_community_id = {uc.user_id: uc.community_id for uc in user_communities}
+    return user_to_community_id

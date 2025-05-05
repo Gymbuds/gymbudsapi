@@ -1,5 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from app.db.models.user import SkillLevel
+from typing import List
+from app.db.models.user_goal import GymGoal
 # Schema for user registration
 class UserCreate(BaseModel):
     name: str
@@ -28,8 +30,14 @@ class AuthToken(BaseModel):
 class UserUpdate(BaseModel):
     name: str | None = None
     profile_picture: str | None = None
-    preferred_workout_goals: str | None = None
     age: int | None = None 
     skill_level: str | None = None 
     weight: int | None = None
     gender: str | None = None
+    zip_code: int | None = None
+    longitude: float | None = None
+    latitude: float | None = None
+
+
+class UserGoalsUpdate(BaseModel):
+    goals: List[GymGoal]

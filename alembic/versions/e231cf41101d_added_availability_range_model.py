@@ -40,3 +40,4 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_availability_ranges_id'), table_name='availability_ranges')
     op.drop_table('availability_ranges')
     # ### end Alembic commands ###
+    op.execute('DROP TYPE day_of_week')
