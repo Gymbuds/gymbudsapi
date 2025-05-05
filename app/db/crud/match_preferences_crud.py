@@ -37,9 +37,9 @@ def update_match_preference(db:Session,user_id:int,gender:GenderPref | None, sta
     if max_location_distance_miles:
         match_pref.max_location_distance_miles = max_location_distance_miles
     if start_age:
-        match_pref.start_weight = start_weight
+        match_pref.start_age = start_age
     if end_weight:
-        match_pref.end_weight = end_weight
+        match_pref.end_age = end_age
     db.commit()
     db.refresh(match_pref)
     return match_pref
