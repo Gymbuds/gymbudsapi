@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from app.schemas.advice import AIAdviceType
 from app.db.crud.workout_log_crud import get_workout_logs_by_user_latest
 from app.db.crud.health_data_crud import get_health_data_by_user_latest
+from app.db.crud.user_goals_crud import get_user_goals
 from app.db.models.user import User
 load_dotenv()
 
@@ -12,6 +13,7 @@ load_dotenv()
 async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_data: bool):
     client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
     user_workouts,workout_earliest,workout_latest= get_workout_logs_by_user_latest(db=db,user_id=user.id,latest_amt_days=30)
+    user_goals = get_user_goals(db=db,user_id=user.id)
     parsed_user_workouts = []
     parsed_health_datas = []
     for workout in user_workouts:
@@ -29,11 +31,12 @@ async def deepSeekChat(db: Session, workout_type: str, user: User, use_health_da
         skill_level = None
     user_preferences  = {
         "name": user.name,
-        "preferred_workout_goals" : user.preferred_workout_goals if user.preferred_workout_goals else None,
+        "workout_goals" : [user_goal.goal.value for user_goal in user_goals] if user_goals else None,
         "age": user.age if user.age else  None,
         "skill_level":  skill_level,
         "weight": user.weight if user.weight else  None,
     }
+    print(user_preferences)
     if use_health_data:
         health_datas = get_health_data_by_user_latest(db, user.id, 30)
         for health_data in health_datas:
