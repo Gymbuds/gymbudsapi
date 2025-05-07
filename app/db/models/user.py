@@ -55,3 +55,20 @@ class User(Base):
 
     match_preferences = relationship("MatchPreference",back_populates="user", cascade="all, delete-orphan")
     goals = relationship("UserGoal", back_populates="user", cascade="all, delete-orphan")
+    user_chats_1 = relationship(
+        "Chat",
+        back_populates="user1",
+        foreign_keys="[Chat.user_id1]",
+        cascade="all, delete-orphan"
+    )
+    user_chats_2 = relationship(
+        "Chat",
+        back_populates="user2",
+        foreign_keys="[Chat.user_id2]",
+        cascade="all, delete-orphan"
+    )
+    sent_messages = relationship(
+        "Message",
+        back_populates="sender",
+        cascade="all, delete-orphan"
+    )
