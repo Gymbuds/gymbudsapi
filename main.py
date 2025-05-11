@@ -1,9 +1,9 @@
 from fastapi import FastAPI,WebSocket
 from app.db.session import check_db_connection  # Import the check_db_connection function
-from app.api.endpoints import match_candidates, users, auth, availabilityranges, workout_logs, ai_advices, health_datas,communities,community_posts,match_results,match_prefs,user_goals,chats
+from app.api.endpoints import match_candidates, users, auth, availabilityranges, workout_logs, ai_advices, health_datas,communities,community_posts,match_results,match_prefs,user_goals,chats,messages
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from app.services.connection_manager import ConnectionManager
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,6 +23,8 @@ app.include_router(match_results.router,prefix="/match",tags=["match_results"])
 app.include_router(match_prefs.router,prefix="/match_pref",tags=['match_prefs'])
 app.include_router(match_candidates.router,prefix="/match_cands",tags=['match_cands'])
 app.include_router(chats.router,prefix="/chats",tags=['chats'])
+app.include_router(messages.router,prefix="/messages",tags=['messages'])
+
 # CORS Middleware Configuration
 origins = [
     "http://localhost.tiangolo.com",
@@ -40,7 +42,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-manager = ConnectionManager()
 # Check if the database is connected at startup
 @app.on_event("startup")
 async def startup():
@@ -48,9 +49,4 @@ async def startup():
         print("Database connection successful!")
     else:
         print("Failed to connect to the database!")
-@app.websocket("/ws")
-async def websocket_endpoint(websocket :WebSocket):
-    manager.connect(websocket=websocket)
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+

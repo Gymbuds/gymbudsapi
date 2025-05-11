@@ -29,12 +29,14 @@ def create_message(db:Session,chat_id:int,user_id:int,content:str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     new_message = Message(
         chat_id=chat_id,
-        user_id=user_id,
+        sender_id=user_id,
         content=content
     )
     db.add(new_message)
     db.commit()
     db.refresh(new_message)
+    print(new_message)
+    return new_message
 def get_messages_for_chat(db:Session,chat_id:int):
     """
     Gets all messages for a particular chat
@@ -44,6 +46,5 @@ def get_messages_for_chat(db:Session,chat_id:int):
     - chat_id (int) :ID of chat
     """
     messages = db.query(Message).filter(Message.chat_id==chat_id).all()
-    if not messages:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
     return messages
