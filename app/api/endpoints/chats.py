@@ -64,6 +64,8 @@ async def websocket_endpoint(websocket :WebSocket):
                 message_json = jsonable_encoder(message_out)
 
                 if user_email in active_connections:
+                    print(user_email)
+                    print(active_connections[user_email])
                     await active_connections[user_email].send_json({
                         "type": "new_message",
                         "message": message_json
