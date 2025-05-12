@@ -32,19 +32,20 @@ def get_chat_for_two_users(user_id:int,db: Session = Depends(get_db),current_use
 async def websocket_endpoint(websocket :WebSocket):
     await websocket.accept()
     db: Session = SessionLocal() 
-    user_id = None
+    user_email = None
     try:
         initial_data = await websocket.receive_json()
         if "type" in initial_data and initial_data["type"]=="user_setup":
             auth_token = initial_data["auth_token"]
             payload = decode_access_token(auth_token)
             curr_user = db.query(User).filter(User.email==payload["sub"]).first()
+            user_email = payload["sub"]
+            active_connections[user_email] = websocket
         while True:
             data = await websocket.receive_json()
-            print(data)
             if data["type"] == "new_message":
                 other_user_id = int(data["other_user_id"])
-                chat = get_chat(db=db, user_id_1=curr_user.id, user_id_2=data["other_user_id"])
+                chat = get_chat(db=db, user_id_1=curr_user.id, user_id_2=other_user_id)
 
                 new_message = create_message(
                     db=db,
@@ -62,8 +63,8 @@ async def websocket_endpoint(websocket :WebSocket):
                 message_out = MessageOut.model_validate(message_dict)
                 message_json = jsonable_encoder(message_out)
 
-                if other_user_id in active_connections:
-                    await active_connections[other_user_id].send_json({
+                if user_email in active_connections:
+                    await active_connections[user_email].send_json({
                         "type": "new_message",
                         "message": message_json
                     })
@@ -72,8 +73,8 @@ async def websocket_endpoint(websocket :WebSocket):
                     "type": "new_message",
                     "message": message_json
                 })
-
+                print(active_connections)
     except WebSocketDisconnect:
-        print(f"User {user_id} disconnected.")
-        if user_id in active_connections:
-            del active_connections[user_id]
+        print(f"User {user_email} disconnected.")
+        if user_email in active_connections:
+            del active_connections[user_email]
