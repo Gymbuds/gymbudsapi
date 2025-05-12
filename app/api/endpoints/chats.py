@@ -27,7 +27,7 @@ def get_chat_for_two_users(user_id:int,db: Session = Depends(get_db),current_use
         print("Chat not found..Creating chat")
         chat = create_chat(db=db,user_id_1=current_user.id,user_id_2=user_id)
         
-    return chat
+    return chat.id
 @router.websocket("/ws")
 async def websocket_endpoint(websocket :WebSocket):
     await websocket.accept()
