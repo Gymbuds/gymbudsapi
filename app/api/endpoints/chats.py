@@ -46,7 +46,7 @@ async def websocket_endpoint(websocket :WebSocket):
             if data["type"] == "new_message":
                 other_user_id = int(data["other_user_id"])
                 chat = get_chat(db=db, user_id_1=curr_user.id, user_id_2=other_user_id)
-
+                other_user_email = db.query(User).filter(User.id==other_user_id).first().email
                 new_message = create_message(
                     db=db,
                     chat_id=chat.id,
@@ -63,10 +63,10 @@ async def websocket_endpoint(websocket :WebSocket):
                 message_out = MessageOut.model_validate(message_dict)
                 message_json = jsonable_encoder(message_out)
 
-                if user_email in active_connections:
-                    print(user_email)
-                    print(active_connections[user_email])
-                    await active_connections[user_email].send_json({
+                if other_user_email in active_connections:
+                    print(other_user_email)
+                    print(active_connections[other_user_email])
+                    await active_connections[other_user_email].send_json({
                         "type": "new_message",
                         "message": message_json
                     })
