@@ -1,7 +1,7 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String,Float,Text,DateTime,Enum
+from sqlalchemy import Column,Integer,String,Float,DateTime,Enum
 from sqlalchemy.orm import relationship
-import datetime
+from datetime import datetime,timezone
 import enum
 class SkillLevel(enum.Enum):
     BEGINNER = "BEGINNER"
@@ -21,7 +21,7 @@ class User(Base):
     profile_picture = Column (String,nullable=True)
     latitude = Column(Float,nullable=True)
     longitude = Column (Float,nullable=True)
-    created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     age = Column(Integer,nullable=True)
     skill_level = Column(Enum(SkillLevel), nullable=True)
     weight = Column(Integer,nullable=True)
