@@ -7,7 +7,8 @@ class Message(Base):
     id = Column(Integer, primary_key=True)
     chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
     sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    content = Column(String, nullable=False)
+    image_url = Column(String,nullable=True)
+    content = Column(String, nullable=True)
     timestamp = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
 
     chat = relationship("Chat", back_populates="messages")

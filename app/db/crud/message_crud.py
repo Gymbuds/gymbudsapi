@@ -8,7 +8,7 @@ from app.db.crud.user_crud import get_user_info_by_id
 
 
 
-def create_message(db:Session,chat_id:int,user_id:int,content:str):
+def create_message(db:Session,chat_id:int,user_id:int,content:str,image_url:str):
     """
     Create a new message and add it to the database.
 
@@ -30,7 +30,8 @@ def create_message(db:Session,chat_id:int,user_id:int,content:str):
     new_message = Message(
         chat_id=chat_id,
         sender_id=user_id,
-        content=content
+        content=content,
+        image_url=image_url
     )
     db.add(new_message)
     db.commit()

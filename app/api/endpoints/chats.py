@@ -6,6 +6,8 @@ from app.db.crud.chat_crud import get_chat,create_chat
 from app.schemas.chat import MessageOut
 from app.db.models.user import User
 from app.db.crud.user_crud import get_user_info_by_id
+from app.core.s3 import create_presigned_upload_url
+
 from fastapi.encoders import jsonable_encoder
 
 from app.db.crud.message_crud import create_message,get_messages_for_chat
@@ -51,12 +53,14 @@ async def websocket_endpoint(websocket :WebSocket):
                     db=db,
                     chat_id=chat.id,
                     user_id=curr_user.id,
+                    image_url=data["image_url"],
                     content=data["content"]
                 )
                 message_dict = {
                     "type":"new_message",
                     "chat_id": new_message.chat_id,
                     "sender_id": new_message.sender_id,
+                    "image_url": new_message.image_url,
                     "content": new_message.content,
                     "timestamp": new_message.timestamp
                 }
@@ -80,3 +84,21 @@ async def websocket_endpoint(websocket :WebSocket):
         print(f"User {user_email} disconnected.")
         if user_email in active_connections:
             del active_connections[user_email]
+@router.get("/generate-upload-url/")
+def generate_upload_url(
+    file_extension: str,  # example: "jpeg", "png"
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if file_extension not in ["jpeg", "jpg", "png"]:
+        raise HTTPException(status_code=400, detail="Invalid file extension")
+
+    presigned_url, s3_file_url = create_presigned_upload_url(
+        user_id=current_user.id,
+        file_extension=file_extension,
+        folder="chat_messages"
+    )
+    return {
+        "upload_url": presigned_url,  # Used by frontend to PUT the image
+        "file_url": s3_file_url       # Final S3 URL to save into DB
+    }
