@@ -1,15 +1,29 @@
-from fastapi_mail import FastMail, MessageSchema
-from app.services.config import mail_config
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+SENDGRID_FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL")
 
 
 async def send_reset_email(email: str, code: str):
-    message = MessageSchema(
+    message = Mail(
+        from_email=SENDGRID_FROM_EMAIL,
+        to_emails=email,
         subject="Password Reset Request",
-        recipients=[email],
-        body=f"Your password reset code is: {code}\n\nPlease open the GymBuds app and enter this code.",
-        subtype="html"
+        html_content=f"""
+            <p>Your password reset code is:</p>
+            <h2>{code}</h2>
+            <p>Please open the GymBuds app and enter this code to reset your password.</p>
+        """
     )
 
-
-    fm = FastMail(mail_config)
-    await fm.send_message(message)
+    try:
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print(f"SendGrid Response: {response.status_code}")
+    except Exception as e:
+        print("SendGrid error:", e)
