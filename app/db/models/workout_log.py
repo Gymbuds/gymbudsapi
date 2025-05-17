@@ -1,7 +1,7 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String,DateTime,ForeignKey,Enum,Text
+from sqlalchemy import Column,Integer,String,DateTime,ForeignKey,Enum,Text,func
 from sqlalchemy.orm import relationship
-import datetime
+from datetime import datetime,timezone
 class WorkoutLog(Base):
     __tablename__ = "workout_logs"
 
@@ -12,7 +12,12 @@ class WorkoutLog(Base):
     notes = Column(Text, nullable=True)
     duration_minutes = Column(Integer, nullable=False)
     mood = Column(Enum("ENERGIZED", "TIRED", "MOTIVATED", "STRESSED", "NEUTRAL", name="mood_type"), nullable=False)
-    date = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    date = Column(
+    DateTime(timezone=True),
+    nullable=True,
+    server_default=func.now(),  # ensures DB default
+    default=lambda: datetime.now(timezone.utc)  # ensures Python fallback
+    )
 
     user = relationship("User", back_populates="workout_logs")
     exercises = relationship("Exercise", back_populates="workout_log", cascade="all, delete-orphan")

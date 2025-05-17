@@ -1,7 +1,7 @@
 from app.db.database import Base
-from sqlalchemy import Column,Integer,String,Float,Text,DateTime,Enum
+from sqlalchemy import Column,Integer,String,Float,DateTime,Enum
 from sqlalchemy.orm import relationship
-import datetime
+from datetime import datetime,timezone
 import enum
 class SkillLevel(enum.Enum):
     BEGINNER = "BEGINNER"
@@ -21,7 +21,7 @@ class User(Base):
     profile_picture = Column (String,nullable=True)
     latitude = Column(Float,nullable=True)
     longitude = Column (Float,nullable=True)
-    created_at = Column(DateTime,default=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     age = Column(Integer,nullable=True)
     skill_level = Column(Enum(SkillLevel), nullable=True)
     weight = Column(Integer,nullable=True)
@@ -55,3 +55,20 @@ class User(Base):
 
     match_preferences = relationship("MatchPreference",back_populates="user", cascade="all, delete-orphan")
     goals = relationship("UserGoal", back_populates="user", cascade="all, delete-orphan")
+    user_chats_1 = relationship(
+        "Chat",
+        back_populates="user1",
+        foreign_keys="[Chat.user_id1]",
+        cascade="all, delete-orphan"
+    )
+    user_chats_2 = relationship(
+        "Chat",
+        back_populates="user2",
+        foreign_keys="[Chat.user_id2]",
+        cascade="all, delete-orphan"
+    )
+    sent_messages = relationship(
+        "Message",
+        back_populates="sender",
+        cascade="all, delete-orphan"
+    )
