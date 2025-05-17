@@ -2,7 +2,7 @@ from fastapi import Depends,APIRouter, HTTPException,status
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.db.models.user import User
-from app.db.crud.message_crud import get_messages_for_chat
+from app.db.crud.message_crud import get_messages_for_chat,get_message
 from app.core.security import get_current_user
 from app.db.crud.chat_crud import get_chat,create_chat
 from typing import List
@@ -14,3 +14,6 @@ def get_messages(user_id:int,db:Session = Depends(get_db),current_user: User = D
     if not chat:
         chat = create_chat(db=db,user_id_1=current_user.id,user_id_2=user_id)
     return get_messages_for_chat(db=db,chat_id=chat.id)
+@router.get("/id/{message_id}")
+def get_message_by_id(message_id: int, db: Session = Depends(get_db)):
+    return get_message(db, message_id)

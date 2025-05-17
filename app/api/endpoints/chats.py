@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends,WebSocket,WebSocketDisconnect,HTTPExceptio
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.core.security import get_current_user,decode_access_token
-from app.db.crud.chat_crud import get_chat,create_chat
+from app.db.crud.chat_crud import get_chat,create_chat,get_user_chats_sorted_by_latest_message
 from app.schemas.chat import MessageOut
 from app.db.models.user import User
 from app.db.crud.user_crud import get_user_info_by_id
@@ -102,3 +102,7 @@ def generate_upload_url(
         "upload_url": presigned_url,  # Used by frontend to PUT the image
         "file_url": s3_file_url       # Final S3 URL to save into DB
     }
+
+@router.get("/sorted/{user_id}")
+def sorted_chats(user_id: int, db: Session = Depends(get_db)):
+    return get_user_chats_sorted_by_latest_message(db, user_id)

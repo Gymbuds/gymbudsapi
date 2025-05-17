@@ -49,3 +49,11 @@ def get_messages_for_chat(db:Session,chat_id:int):
     messages = db.query(Message).filter(Message.chat_id==chat_id).all()
     
     return messages
+def get_message(db: Session, message_id: int):
+    message = db.query(Message).filter(Message.id == message_id).first()
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+    return message
