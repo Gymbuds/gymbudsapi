@@ -26,7 +26,7 @@ def get_similar_schedules_for_user(db: Session, user_id: int):
     # sort both 
 
     user_aval_days = []    # list of days where user has availability
-    user_aval_ranges = []  # corresponding sorted list of user's time ranges per day
+    user_aval_ranges:AvailabilityRange = []  # corresponding sorted list of user's time ranges per day
     potential_similar_schedule_users = set()  # store matched user ids
 
     for day in DayOfWeek:  # get all the days available + list of availability ranges
@@ -58,8 +58,8 @@ def get_similar_schedules_for_user(db: Session, user_id: int):
 
             # Compare their time ranges to the current user's ranges
             for other_range in other_ranges:
-                for user_range in user_aval_ranges[i]:  # user ranges for current day
-                    if user_range.start_time <= other_range.start_time and user_range.end_time >= other_range.end_time:
+                for user_range  in user_aval_ranges[i]:  # user ranges for current day
+                    if (user_range.start_time <= other_range.start_time and user_range.end_time >= other_range.end_time) or (user_range.start_time>=other_range.start_time and user_range.end_time<=other_range.end_time):
                         potential_similar_schedule_users.add(other_user_id)
                         break  # one match is enough, move to next user
                 else:
