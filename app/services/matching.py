@@ -7,7 +7,7 @@ from app.db.crud.user_crud import get_user_info_by_id, get_multiple_users_info_b
 from app.db.crud.community_crud import get_user_preferred_gym, get_multiple_users_preferred_gym_ids
 from app.db.crud.match_preferences_crud import get_match_preference
 from app.db.crud.user_goals_crud import get_list_user_goals_as_set,get_multiple_users_goals_as_set
-from app.db.crud.candidate_crud import create_candidate
+from app.db.crud.candidate_crud import create_candidate,delete_pending_candidates_for_id
 from app.db.models.match_preferences import MatchPreference
 from sqlalchemy import and_
 from math import radians,cos,sin,asin,sqrt
@@ -24,11 +24,11 @@ def get_similar_schedules_for_user(db: Session, user_id: int):
     # say for example my Monday: [1,5][7,10] vs someone else's Monday [2,5][6,10]
     # https://leetcode.com/problems/merge-intervals/description/  o(nlogn)
     # sort both 
-
+    delete_pending_candidates_for_id(db=db,user_id=user_id)
     user_aval_days = []    # list of days where user has availability
     user_aval_ranges:AvailabilityRange = []  # corresponding sorted list of user's time ranges per day
     potential_similar_schedule_users = set()  # store matched user ids
-
+    
     for day in DayOfWeek:  # get all the days available + list of availability ranges
         day_ranges = db.query(AvailabilityRange).filter(
             and_(

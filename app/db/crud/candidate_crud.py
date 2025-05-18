@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.db.models.match_candidate import MatchCandidate, Status
+from fastapi import HTTPException,status
 from app.db.crud.match_crud import create_match
 from sqlalchemy import and_
 def create_candidate(db: Session, user_id: int, candidate_scores: dict[int, float]):
@@ -45,3 +46,11 @@ def update_candidate_status(db:Session,match_candidate_id:int,status:str):
     db.commit()
     db.refresh(match_candidate)
 
+def delete_pending_candidates_for_id(db:Session,user_id:int):
+    candidates = db.query(MatchCandidate).filter(and_(MatchCandidate.user_id==user_id),(MatchCandidate.status=="PENDING")).all()
+    if not candidates:
+        raise HTTPException(status_code=404, detail="candidates not found")
+    for can in candidates:
+        db.delete(can)
+    db.commit()
+    
