@@ -21,6 +21,6 @@ class AIAdviceResponse(BaseModel):
     ai_feedback: str
     user_id: int
     created_at: datetime
-    workout_earliest_date: datetime
-    workout_latest_date: datetime
+    workout_earliest_date: datetime | None = None
+    workout_latest_date: datetime | None = None
     contains_health_data:bool
