@@ -48,8 +48,7 @@ def update_candidate_status(db:Session,match_candidate_id:int,status:str):
 
 def delete_pending_candidates_for_id(db:Session,user_id:int):
     candidates = db.query(MatchCandidate).filter(and_(MatchCandidate.user_id==user_id),(MatchCandidate.status=="PENDING")).all()
-    if not candidates:
-        raise HTTPException(status_code=404, detail="candidates not found")
+    
     for can in candidates:
         db.delete(can)
     db.commit()
