@@ -2,8 +2,6 @@
 
 Backend API for GymBuds (built with FastAPI), handles any HTTP requests from the front end and any CRUD operations necessary for interacting with the database.
 
-#
-
 # Technologies Used + Packages used
 
 ## Technology
@@ -41,11 +39,11 @@ sendgrid [email sending]
 
 # Steps to install and run
 
-## postgres set up db
+## Postgres Setup [if local]
 
 install pgadmin and postgresql
 
-### Pre-load of system
+## Pre-load of system
 
 #### Open up a zsh or terminal
 
@@ -53,17 +51,19 @@ install pgadmin and postgresql
 
 -You need to get to latest alembic migration: `poetry run alembic upgrade head` [Only done if you are on local database]
 
-## If you need to run the front end with a iOS Device
+## Running our system
+
+#### Open up a zsh or terminal
+
+Get our system running <br>
+`poetry run uvicorn main:app`
+
+#### Open up a SEPERATE zsh or terminal
 
 You will need to run our backend with a tunneling service [ngrok] <br>
 https://dashboard.ngrok.com/ <br>
-command : `poetry run ngrok http 8000`
-
-## If you need to run the front end with a iOS Simulator
-
-`poetry run uvicorn main:app`<br>
-Check the docs to ensure in working order <br>
-http://127.0.0.1:8000/docs
+command : `poetry run ngrok http 8000` <br>
+This will give you a link that you can use in the front-end-env
 
 # Our Deployment process
 
